@@ -1,4 +1,67 @@
 import os
+import requests
+import json
+from fpdf import FPDF
+import tempfile
+
+def load_lottie_url(url: str):
+    """Load Lottie animation from URL."""
+    try:
+        r = requests.get(url)
+        if r.status_code != 200:
+            return None
+        return r.json()
+    except:
+        return None
+
+def create_pdf_report(resume_score, feedback, interview_data):
+    """
+    Generates a PDF report card.
+    interview_data: List of dicts {question, answer, rating, feedback}
+    """
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, "AI Interview Performance Report", ln=True, align="C")
+    
+    pdf.set_font("Arial", "", 12)
+    pdf.ln(10)
+    pdf.cell(0, 10, f"Resume Score: {resume_score}/100", ln=True)
+    
+    if feedback:
+        pdf.ln(5)
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 10, "Resume Feedback:", ln=True)
+        pdf.set_font("Arial", "", 10)
+        for item in feedback:
+             pdf.multi_cell(0, 6, f"- {item}")
+    
+    pdf.ln(10)
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Interview Details", ln=True)
+    
+    for i, data in enumerate(interview_data):
+        pdf.set_font("Arial", "B", 11)
+        pdf.ln(5)
+        # Handle unicode issues with latin-1 in fpdf by encoding/decoding or replacing
+        q_text = f"Q{i+1}: {data.get('question', '')}".encode('latin-1', 'replace').decode('latin-1')
+        pdf.multi_cell(0, 6, q_text)
+        
+        pdf.set_font("Arial", "", 10)
+        ans_text = f"Your Answer: {data.get('answer', '')}".encode('latin-1', 'replace').decode('latin-1')
+        pdf.multi_cell(0, 6, ans_text)
+        
+        rating = data.get('rating', 'N/A')
+        fb_text = f"Rating: {rating}/10 | Feedback: {data.get('feedback', '')}".encode('latin-1', 'replace').decode('latin-1')
+        pdf.set_text_color(100, 100, 100)
+        pdf.multi_cell(0, 6, fb_text)
+        pdf.set_text_color(0, 0, 0)
+        pdf.ln(2)
+
+    # Save to temp file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        pdf.output(tmp.name)
+        return tmp.name
 
 def load_skill_keywords():
     # Expanded list of common skills
