@@ -59,18 +59,26 @@ def render_dashboard():
     with col1:
         st.metric("Total Questions Answered", len(df))
     with col2:
-        avg_score = df['rating'].mean()
-        st.metric("Average AI Rating", f"{avg_score:.1f}/10")
+        if 'rating' in df.columns:
+            avg_score = df[df['rating'] > 0]['rating'].mean()
+            st.metric("Average AI Rating", f"{avg_score:.1f}/10" if pd.notna(avg_score) else "N/A")
+        else:
+            st.metric("Average AI Rating", "N/A")
     with col3:
-        st.metric("Sessions Completed", df['session_id'].nunique())
+        st.metric("Sessions Completed", df['session_id'].nunique() if 'session_id' in df.columns else 0)
 
     # Recent History
     st.subheader("Recent Activity")
-    st.dataframe(df[['timestamp', 'role', 'type', 'rating', 'feedback']].sort_values('timestamp', ascending=False).head(10), use_container_width=True)
+    if not df.empty:
+        cols_to_show = ['timestamp', 'role', 'type', 'question', 'rating']
+        # Filter existing cols
+        existing_cols = [c for c in cols_to_show if c in df.columns]
+        st.dataframe(df.sort_values('timestamp', ascending=False).head(10)[existing_cols], use_container_width=True)
 
     # Chart
     st.subheader("Performance Trend")
-    if len(df) > 1:
+    if len(df) > 1 and 'rating' in df.columns:
+        # Simple moving average if possible, or just raw
         chart_data = df.groupby('timestamp')['rating'].mean()
         st.line_chart(chart_data)
 
@@ -79,9 +87,9 @@ def render_coding_arena():
     st.markdown("Practice technical coding problems with AI Code Review.")
     
     if not API_KEY:
-        st.warning("Coding Arena requires Gemini API Key.")
-        return
-
+        st.warning("⚠️ Coding Arena requires Gemini API Key to function.")
+        # Allow demo but warn
+    
     # Select Problem
     problem = st.selectbox("Select Challenge", [
         "Reverse a Linked List", 
@@ -97,6 +105,10 @@ def render_coding_arena():
     code = st_ace(language='python', theme='monokai', height=300, key="code_editor")
     
     if st.button("🚀 Submit Code"):
+        if not API_KEY:
+            st.error("Please configure GEMINI_API_KEY in .env first.")
+            return
+
         with st.spinner("AI is reviewing your code..."):
             review = llm.review_code(problem, code)
             st.divider()
@@ -168,6 +180,8 @@ def render_interview_mode(mode="Standard"):
                     lottie_json = utils.load_lottie_url(lottie_url)
                     if lottie_json:
                         st_lottie(lottie_json, height=200, key=f"avatar_{idx}")
+                    else:
+                        st.image("https://api.dicebear.com/7.x/avataaars/svg?seed=Robot", width=150)
                     
                     # Audio Autoplay
                     audio_path = voice.generate_audio(q_text)

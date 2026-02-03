@@ -4,15 +4,16 @@
 AI Interview Question Generator is a Python application that analyzes a candidate's resume (PDF or text) and generates role-specific interview questions. It uses NLP (spaCy, NLTK) and rule-based logic to extract skills, experience, projects, and technologies, then creates technical, behavioral, and project-based questions. The app simulates an interview flow, asking questions one by one, accepting typed answers, and supporting difficulty levels (Easy/Medium/Hard).
 
 ## Features
-- **🎩 Professional UI**: Clean, modern "Video Call" aesthetic with a central AI avatar.
-- **🤖 Gemini AI Integration**: Dynamic question generation & Answer Grading.
-- **🗣️ Full Voice Conversation**:
-    - **AI Speaks**: Text-to-Speech reads questions.
-    - **You Speak**: Speech-to-Text listens to your answers (Recorder widget).
+- **🤖 Animated AI Avatar**: Real-time talking avatar (Lottie Animations) coupled with Text-to-Speech.
+- **📈 Progress Dashboard**: Track your interview performance, average ratings, and improvement over time with visual charts.
+- **🎯 JD Gap Analysis**: Paste a Job Description to get custom questions focusing on your missing skills.
+- **💻 Coding Arena**: Integrated Code Editor with AI-powered Code Review (Time Complexity & Correctness).
+- **🗣️ Voice Conversation**: Full two-way voice interaction (Speak & Listen).
+- **📄 PDF Report Cards**: Download a detailed performance review after each session.
+- **🎩 Professional UI**: Clean, modern aesthetic with Sidebar navigation.
 - **🔒 Secure Config**: Loads API keys from `.env` file.
 - **Resume Parsing**: Deep analysis of skills and roles from PDF/TXT.
-- **Question Logic**: Automatically falls back to rule-based engine if offline.
-- **Export**: Downlad full transcripts.
+- **Auto-Fallback**: Works offline (rule-based) if no API key is provided.
 
 ## Installation Steps
 1. Clone or download this repository
