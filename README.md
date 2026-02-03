@@ -4,14 +4,15 @@
 AI Interview Question Generator is a Python application that analyzes a candidate's resume (PDF or text) and generates role-specific interview questions. It uses NLP (spaCy, NLTK) and rule-based logic to extract skills, experience, projects, and technologies, then creates technical, behavioral, and project-based questions. The app simulates an interview flow, asking questions one by one, accepting typed answers, and supporting difficulty levels (Easy/Medium/Hard).
 
 ## Features
-- **Interactive Web Interface**: Built with Streamlit for a smooth user experience.
-- **🤖 Gemini AI Integration**: Uses Google's Gemini Pro to generate custom questions and evaluate your answers *in real-time*.
-- **🗣️ Voice Mode & Avatars**: Choose an interviewer persona (HR, Tech Lead) and hear them ask questions aloud.
-- **Resume Parsing**: Upload PDF or TXT files to extract skills, experience, and projects.
-- **Resume Score**: Get immediate feedback on your resume's structure and completeness.
-- **Answer Assistant**: Generates detailed answer keys and talking points.
-- **Transcript Export**: Download your full interview session for review.
-- **Privacy First**: All processing happens locally (unless using Gemini API); no data files are uploaded to the cloud by us.
+- **🎩 Professional UI**: Clean, modern "Video Call" aesthetic with a central AI avatar.
+- **🤖 Gemini AI Integration**: Dynamic question generation & Answer Grading.
+- **🗣️ Full Voice Conversation**:
+    - **AI Speaks**: Text-to-Speech reads questions.
+    - **You Speak**: Speech-to-Text listens to your answers (Recorder widget).
+- **🔒 Secure Config**: Loads API keys from `.env` file.
+- **Resume Parsing**: Deep analysis of skills and roles from PDF/TXT.
+- **Question Logic**: Automatically falls back to rule-based engine if offline.
+- **Export**: Downlad full transcripts.
 
 ## Installation Steps
 1. Clone or download this repository
@@ -19,8 +20,13 @@ AI Interview Question Generator is a Python application that analyzes a candidat
    ```bash
    pip install -r requirements.txt
    ```
-   *Note: Requires `ffmpeg` installed on your system if you encounter audio issues, though gTTS usually works standalone.*
-3. Download NLP data (first run only):
+3. Set up Configuration:
+   - Copy `.env.example` to `.env`.
+   - Open `.env` and paste your Google Gemini API Key.
+   ```bash
+   GEMINI_API_KEY=your_key_here
+   ```
+4. Download NLP data (first run only):
    ```python
    python -c "import nltk; nltk.download('punkt'); nltk.download('averaged_perceptron_tagger')"
    python -m spacy download en_core_web_sm

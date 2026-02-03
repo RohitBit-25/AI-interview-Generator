@@ -5,8 +5,13 @@ from resume_parser import ResumeParser
 from question_generator import QuestionGenerator
 from llm_handler import LLMHandler
 from voice_handler import VoiceHandler
+import config
+from streamlit_mic_recorder import mic_recorder
 
-st.set_page_config(page_title="AI Interview Assistant", page_icon="📝", layout="wide")
+st.set_page_config(page_title="AI Interview Pro", page_icon="👔", layout="wide")
+
+# Validates and loads config
+API_KEY = config.Config.get_api_key()
 
 def save_uploaded_file(uploaded_file):
     try:
@@ -19,176 +24,179 @@ def save_uploaded_file(uploaded_file):
         return None
 
 def main():
-    st.title("🤖 AI Interview Assistant")
+    # --- Custom CSS for Professional Look ---
     st.markdown("""
-    Upload your resume and get role-specific interview questions.
-    Now with **Gemini AI** support for dynamic questions and **Voice Mode**!
-    """)
+        <style>
+        .stApp { background-color: #f5f7fa; }
+        .main-header { font-size: 2.5rem; color: #1e3a8a; font-weight: 800; text-align: center; margin-bottom: 2rem; }
+        .avatar-container { display: flex; justify-content: center; margin: 20px 0; }
+        .avatar-img { border-radius: 50%; border: 4px solid #3b82f6; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); width: 200px; height: 200px; object-fit: cover; }
+        .question-box { background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-left: 5px solid #3b82f6; margin-bottom: 20px; }
+        .question-text { font-size: 1.5rem; color: #1f2937; font-weight: 600; }
+        .status-bar { padding: 10px; background: #e5e7eb; border-radius: 8px; margin-bottom: 10px; font-size: 0.9rem; text-align: center; }
+        </style>
+        """, unsafe_allow_html=True)
 
-    # Sidebar
-    st.sidebar.header("⚙️ Settings")
-    
-    # API Key Input
-    api_key = st.sidebar.text_input("🔑 Gemini API Key (Optional)", type="password", help="Enter your Google Gemini API Key for advanced features.")
-    
-    # Difficulty
-    difficulty = st.sidebar.select_slider(
-        "Select Difficulty Level",
-        options=["Easy", "Medium", "Hard"],
-        value="Medium"
-    )
-    
-    # Voice Mode
-    enable_voice = st.sidebar.toggle("Enable Voice Mode (AI Avatar)")
-    
-    if enable_voice:
-        persona = st.sidebar.selectbox("Interviewer Persona", ["Professional HR", "Tech Lead", "Friendly Recruiter"])
-        st.sidebar.image("https://api.dicebear.com/7.x/avataaars/svg?seed=" + persona, width=100, caption=f"Your Interviewer: {persona}")
+    st.markdown('<div class="main-header">Professional AI Interviewer</div>', unsafe_allow_html=True)
 
-    # File Uploader
-    uploaded_file = st.file_uploader("Upload Resume (PDF or TXT)", type=["pdf", "txt"])
-
-    if uploaded_file is not None:
-        # Save file temporarily
-        temp_path = save_uploaded_file(uploaded_file)
+    # Sidebar Settings
+    with st.sidebar:
+        st.header("⚙️ Configuration")
         
-        if temp_path:
-            with st.spinner("Analyzing Resume..."):
-                try:
-                    # Parse Resume
-                    parser = ResumeParser(temp_path)
-                    parsed_resume = parser.parse()
-                    
-                    # Cleanup temp file
-                    os.unlink(temp_path)
-                    
-                    # --- RESUME ANALYSIS SIDEBAR ---
-                    st.sidebar.divider()
-                    st.sidebar.subheader("📊 Resume Score")
-                    
-                    # Analyze Quality
-                    analysis = parser.analyze_quality()
-                    score = analysis['score']
-                    
-                    # Display Circular Progress or Bar
-                    if score >= 80:
-                         st.sidebar.success(f"Excellent! {score}/100")
-                    elif score >= 50:
-                         st.sidebar.warning(f"Good, but needs work. {score}/100")
-                    else:
-                         st.sidebar.error(f"Needs Improvement. {score}/100")
-                    
-                    st.sidebar.progress(score / 100)
-                    
-                    if analysis['feedback']:
-                        with st.sidebar.expander("Improvement Tips"):
-                            for tip in analysis['feedback']:
-                                st.write(f"- {tip}")
+        # API Key Management
+        user_api_key = st.text_input("Gemini API Key", value=API_KEY if API_KEY else "", type="password", placeholder="Loaded from .env" if API_KEY else "Enter Key")
+        final_api_key = user_api_key if user_api_key else API_KEY
+        
+        if final_api_key:
+            st.success("API Key Active")
+        else:
+            st.warning("Running in Offline Mode (Basic)")
 
-                    # --- DETAILED PARSING ---
-                    with st.expander("📄 Parsed Resume Details", expanded=False):
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            st.subheader("Skills Found")
-                            st.write(", ".join(parsed_resume.get('skills', []) or ["None detected"]))
-                            st.subheader("Roles Detected")
-                            st.write(", ".join(parsed_resume.get('roles', []) or ["None detected"]))
-                        with col2:
-                            st.subheader("Technologies")
-                            st.write(", ".join(parsed_resume.get('technologies', []) or ["None detected"]))
-                            st.subheader("Project Keywords")
-                            st.write(f"Found related keywords in {len(parsed_resume.get('projects', []))} sections.")
+        difficulty = st.select_slider("Difficulty", options=["Easy", "Medium", "Hard"], value="Medium")
+        
+        st.divider()
+        enable_voice = st.toggle("Enable Voice Mode", value=True)
+        persona = st.selectbox("Interviewer Persona", ["Professional HR", "Tech Lead", "Friendly Recruiter"])
+    
+    # Initialize Handlers
+    llm = LLMHandler(final_api_key)
+    voice = VoiceHandler()
 
-                    # --- QUESTION GENERATION ---
-                    st.divider()
-                    st.header(f"📝 Generated Interview Questions ({difficulty})")
-                    
-                    questions = []
-                    
-                    # Initialize Handlers
-                    llm = LLMHandler(api_key)
-                    voice = VoiceHandler()
+    # --- SESSION STATE MANAGEMENT ---
+    if 'resume_parsed' not in st.session_state:
+        st.session_state.resume_parsed = False
+    if 'current_question_idx' not in st.session_state:
+        st.session_state.current_question_idx = 0
+    if 'questions' not in st.session_state:
+        st.session_state.questions = []
+    if 'answers' not in st.session_state:
+        st.session_state.answers = {}
 
-                    # Check if we should use LLM or fallback
-                    if api_key:
-                        with st.spinner("🤖 Gemini is generating custom questions..."):
-                            role = parser.extract_role_based_info()
-                            questions = llm.generate_questions(parser.text, role, difficulty)
-                            if not questions:
-                                st.error("Gemini failed to generate questions. Falling back to rule-based engine.")
-                    
-                    # Fallback if LLM setup failed or no key
-                    if not questions:
-                        qgen = QuestionGenerator(parsed_resume)
-                        questions = qgen.generate_all_questions(difficulty)
-                    
-                    # Store answers for export
-                    if 'interview_log' not in st.session_state:
-                         st.session_state.interview_log = {}
-
-                    if not questions:
-                        st.warning("Could not generate specific questions. Ensure your resume has clear 'Skills' or 'Projects' sections.")
-                    else:
-                        full_transcript = f"AI Interview Session - {difficulty} Level\n\n"
-                        
-                        for i, q_data in enumerate(questions):
-                            st.subheader(f"Q{i+1}: {q_data['question']}")
-                            st.caption(f"Topic: {q_data.get('topic', 'General')} | Type: {q_data.get('type', 'General')}")
-                            
-                            # Voice Playback
-                            if enable_voice:
-                                audio_path = voice.generate_audio(q_data['question'])
-                                if audio_path:
-                                    st.audio(audio_path, format="audio/mp3")
-                            
-                            # Answer Area
-                            user_ans = st.text_area(f"Your Answer for Q{i+1}:", key=f"ans_{i}", height=100)
-                            
-                            # LLM Feedback Button
-                            if api_key and user_ans:
-                                if st.button(f"✨ Evaluate Answer Q{i+1}", key=f"eval_{i}"):
-                                    with st.spinner("Gemini is evaluating your answer..."):
-                                        eval_result = llm.evaluate_answer(q_data['question'], user_ans)
-                                        st.markdown(f"**Rating:** {eval_result.get('rating', 0)}/10")
-                                        st.info(f"**Feedback:** {eval_result.get('feedback', 'No feedback')}")
-                                        with st.expander("View Improved Answer"):
-                                            st.write(eval_result.get('better_answer', 'N/A'))
-                                        
-                                        # Add evaluation to transcript
-                                        full_transcript += f"  [AI Evaluation]: {eval_result.get('feedback', '')} (Rating: {eval_result.get('rating')})\n"
-
-                            # Update Transcript
-                            full_transcript += f"Q{i+1}: {q_data['question']}\n"
-                            full_transcript += f"Your Answer: {user_ans if user_ans else '(No Answer)'}\n"
-                            
-                            # Hints / Answer Key (Static Fallback if LLM present but hints are in data)
-                            with st.expander("💡 Reveal Answer Key / Hints"):
-                                if q_data.get('hints'):
-                                    st.markdown("### Key Talking Points:")
-                                    for hint in q_data['hints']:
-                                        st.markdown(f"- {hint}")
-                                        full_transcript += f"  - Hint: {hint}\n"
-                                else:
-                                    st.info("No specific answer key available.")
-                            
-                            full_transcript += "-" * 40 + "\n\n"
-                            st.divider()
-                        
-                        # --- EXPORT BUTTON ---
-                        st.download_button(
-                            label="📥 Download Interview Transcript",
-                            data=full_transcript,
-                            file_name="interview_transcript.txt",
-                            mime="text/plain"
-                        )
-                            
-                except Exception as e:
-                    st.error(f"An error occurred: {e}")
-                    import traceback
-                    st.code(traceback.format_exc())
+    # File Uploader Container
+    if not st.session_state.resume_parsed:
+        col1, col2 = st.columns([1, 2])
+        with col2:
+            st.info("👋 Welcome! Upload your resume to begin the interview session.")
+            uploaded_file = st.file_uploader("Upload Resume (PDF/TXT)", type=["pdf", "txt"])
+            
+            if uploaded_file:
+                temp_path = save_uploaded_file(uploaded_file)
+                if temp_path:
+                    with st.spinner("Analyzing profile..."):
+                        parser = ResumeParser(temp_path)
+                        st.session_state.parsed_resume = parser.parse()
+                        st.session_state.role = parser.extract_role_based_info()
+                        st.session_state.resume_text = parser.text
+                        st.session_state.resume_parsed = True
+                        os.unlink(temp_path)
+                        st.rerun()
 
     else:
-        st.info("👆 Please upload a resume to start.")
+        # --- INTERVIEW STAGE ---
+        
+        # 1. Generate Questions (Once)
+        if not st.session_state.questions:
+            with st.spinner(f"Generating custom questions for {st.session_state.role}..."):
+                if final_api_key:
+                    st.session_state.questions = llm.generate_questions(st.session_state.resume_text, st.session_state.role, difficulty)
+                
+                # Fallback
+                if not st.session_state.questions:
+                    qgen = QuestionGenerator(st.session_state.parsed_resume)
+                    st.session_state.questions = qgen.generate_all_questions(difficulty)
+        
+        questions = st.session_state.questions
+        curr_idx = st.session_state.current_question_idx
+        
+        # Layout
+        col_main, col_info = st.columns([2, 1])
+        
+        with col_main:
+            # Avatar Display
+            avatar_url = f"https://api.dicebear.com/7.x/avataaars/svg?seed={persona}&backgroundColor=b6e3f4"
+            st.markdown(f'<div class="avatar-container"><img src="{avatar_url}" class="avatar-img"></div>', unsafe_allow_html=True)
+            
+            if curr_idx < len(questions):
+                q_data = questions[curr_idx]
+                
+                # Question Card
+                st.markdown(f"""
+                <div class="question-box">
+                    <div style="color: #6b7280; font-size: 0.9em; margin-bottom: 5px;">Question {curr_idx + 1} of {len(questions)}</div>
+                    <div class="question-text">{q_data['question']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Auto-play Audio
+                if enable_voice:
+                     # Unique key ensures it doesn't replay on interact
+                    audio_path = voice.generate_audio(q_data['question'])
+                    if audio_path:
+                        st.audio(audio_path, format="audio/mp3", start_time=0)
+
+                # Answer Section
+                st.markdown("### 🎙️ Your Answer")
+                
+                # Two input methods: Voice or Text
+                input_tab, voice_tab = st.tabs(["✍️ Text Input", "🎤 Voice Recording"])
+                
+                with voice_tab:
+                    st.info("Click the microphone to start recording. Click again to stop.")
+                    audio_blob = mic_recorder(start_prompt="Start Recording", stop_prompt="Stop Recording", key=f"recorder_{curr_idx}")
+                    
+                    if audio_blob and f"transcribed_{curr_idx}" not in st.session_state:
+                         st.info("Transcribing audio...")
+                         text = voice.transcribe_audio(audio_blob['bytes'])
+                         st.session_state[f"transcribed_{curr_idx}"] = text
+                    
+                    # Display Info if transcribed
+                    if f"transcribed_{curr_idx}" in st.session_state:
+                         st.success("Transcribed: " + st.session_state[f"transcribed_{curr_idx}"])
+
+                with input_tab:
+                    # Pre-fill with transcribed text if available
+                    default_ans = st.session_state.get(f"transcribed_{curr_idx}", "")
+                    user_ans = st.text_area("Type or Edit Answer:", value=default_ans, height=150, key=f"ans_area_{curr_idx}")
+
+                # Actions
+                col_actions1, col_actions2 = st.columns(2)
+                
+                with col_actions1:
+                    if final_api_key and user_ans:
+                         if st.button("✨ Analyze My Answer", key=f"eval_{curr_idx}"):
+                              with st.spinner("Analyzing..."):
+                                   eval_res = llm.evaluate_answer(q_data['question'], user_ans)
+                                   st.markdown(f"**Rating:** {eval_res.get('rating')}/10")
+                                   st.info(eval_res.get('feedback'))
+
+                with col_actions2:
+                     if st.button("Next Question ➡️", type="primary", key=f"next_{curr_idx}"):
+                          # Save Answer
+                          st.session_state.answers[curr_idx] = user_ans
+                          st.session_state.current_question_idx += 1
+                          st.rerun()
+
+            else:
+                st.success("🎉 Interview Completed!")
+                st.balloons()
+                # Export logic would go here
+
+        with col_info:
+            st.subheader("Your Profile")
+            st.caption(f"Role: {st.session_state.role}")
+            st.divider()
+            
+            # Progress
+            progress = (curr_idx / len(questions))
+            st.progress(progress, text=f"Progress: {int(progress*100)}%")
+            
+            # Hints
+            if curr_idx < len(questions):
+                if st.button("💡 Show Hint"):
+                     hints = questions[curr_idx].get('hints', [])
+                     for h in hints:
+                          st.write(f"- {h}")
+
 
 
 if __name__ == "__main__":
