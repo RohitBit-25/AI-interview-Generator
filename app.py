@@ -3,6 +3,8 @@ import os
 import tempfile
 from resume_parser import ResumeParser
 from question_generator import QuestionGenerator
+from llm_handler import LLMHandler
+from voice_handler import VoiceHandler
 
 st.set_page_config(page_title="AI Interview Assistant", page_icon="📝", layout="wide")
 
@@ -19,17 +21,29 @@ def save_uploaded_file(uploaded_file):
 def main():
     st.title("🤖 AI Interview Assistant")
     st.markdown("""
-    Upload your resume and get role-specific interview questions with **answer keys**! 
-    Prepare for your next job interview with confidence.
+    Upload your resume and get role-specific interview questions.
+    Now with **Gemini AI** support for dynamic questions and **Voice Mode**!
     """)
 
     # Sidebar
     st.sidebar.header("⚙️ Settings")
+    
+    # API Key Input
+    api_key = st.sidebar.text_input("🔑 Gemini API Key (Optional)", type="password", help="Enter your Google Gemini API Key for advanced features.")
+    
+    # Difficulty
     difficulty = st.sidebar.select_slider(
         "Select Difficulty Level",
         options=["Easy", "Medium", "Hard"],
         value="Medium"
     )
+    
+    # Voice Mode
+    enable_voice = st.sidebar.toggle("Enable Voice Mode (AI Avatar)")
+    
+    if enable_voice:
+        persona = st.sidebar.selectbox("Interviewer Persona", ["Professional HR", "Tech Lead", "Friendly Recruiter"])
+        st.sidebar.image("https://api.dicebear.com/7.x/avataaars/svg?seed=" + persona, width=100, caption=f"Your Interviewer: {persona}")
 
     # File Uploader
     uploaded_file = st.file_uploader("Upload Resume (PDF or TXT)", type=["pdf", "txt"])
@@ -89,8 +103,24 @@ def main():
                     st.divider()
                     st.header(f"📝 Generated Interview Questions ({difficulty})")
                     
-                    qgen = QuestionGenerator(parsed_resume)
-                    questions = qgen.generate_all_questions(difficulty)
+                    questions = []
+                    
+                    # Initialize Handlers
+                    llm = LLMHandler(api_key)
+                    voice = VoiceHandler()
+
+                    # Check if we should use LLM or fallback
+                    if api_key:
+                        with st.spinner("🤖 Gemini is generating custom questions..."):
+                            role = parser.extract_role_based_info()
+                            questions = llm.generate_questions(parser.text, role, difficulty)
+                            if not questions:
+                                st.error("Gemini failed to generate questions. Falling back to rule-based engine.")
+                    
+                    # Fallback if LLM setup failed or no key
+                    if not questions:
+                        qgen = QuestionGenerator(parsed_resume)
+                        questions = qgen.generate_all_questions(difficulty)
                     
                     # Store answers for export
                     if 'interview_log' not in st.session_state:
@@ -105,14 +135,33 @@ def main():
                             st.subheader(f"Q{i+1}: {q_data['question']}")
                             st.caption(f"Topic: {q_data.get('topic', 'General')} | Type: {q_data.get('type', 'General')}")
                             
+                            # Voice Playback
+                            if enable_voice:
+                                audio_path = voice.generate_audio(q_data['question'])
+                                if audio_path:
+                                    st.audio(audio_path, format="audio/mp3")
+                            
                             # Answer Area
                             user_ans = st.text_area(f"Your Answer for Q{i+1}:", key=f"ans_{i}", height=100)
                             
+                            # LLM Feedback Button
+                            if api_key and user_ans:
+                                if st.button(f"✨ Evaluate Answer Q{i+1}", key=f"eval_{i}"):
+                                    with st.spinner("Gemini is evaluating your answer..."):
+                                        eval_result = llm.evaluate_answer(q_data['question'], user_ans)
+                                        st.markdown(f"**Rating:** {eval_result.get('rating', 0)}/10")
+                                        st.info(f"**Feedback:** {eval_result.get('feedback', 'No feedback')}")
+                                        with st.expander("View Improved Answer"):
+                                            st.write(eval_result.get('better_answer', 'N/A'))
+                                        
+                                        # Add evaluation to transcript
+                                        full_transcript += f"  [AI Evaluation]: {eval_result.get('feedback', '')} (Rating: {eval_result.get('rating')})\n"
+
                             # Update Transcript
                             full_transcript += f"Q{i+1}: {q_data['question']}\n"
                             full_transcript += f"Your Answer: {user_ans if user_ans else '(No Answer)'}\n"
                             
-                            # Hints / Answer Key
+                            # Hints / Answer Key (Static Fallback if LLM present but hints are in data)
                             with st.expander("💡 Reveal Answer Key / Hints"):
                                 if q_data.get('hints'):
                                     st.markdown("### Key Talking Points:")
@@ -120,7 +169,7 @@ def main():
                                         st.markdown(f"- {hint}")
                                         full_transcript += f"  - Hint: {hint}\n"
                                 else:
-                                    st.info("No specific answer key available for this custom question.")
+                                    st.info("No specific answer key available.")
                             
                             full_transcript += "-" * 40 + "\n\n"
                             st.divider()
@@ -140,6 +189,7 @@ def main():
 
     else:
         st.info("👆 Please upload a resume to start.")
+
 
 if __name__ == "__main__":
     main()
