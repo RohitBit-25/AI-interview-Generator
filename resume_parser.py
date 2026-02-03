@@ -1,9 +1,9 @@
 import re
 from typing import List, Dict, Any
 from pdfminer.high_level import extract_text
-import spacy
+import utils
 
-nlp = spacy.load('en_core_web_sm')
+# nlp = spacy.load('en_core_web_sm') # Removed due to Python 3.14 incompatibility
 
 class ResumeParser:
     def __init__(self, resume_path: str):
@@ -29,21 +29,24 @@ class ResumeParser:
         return list(found_skills)
 
     def extract_experience(self) -> List[str]:
-        # Extract experience sentences using regex and NLP
+        # Extract experience sentences using regex splitting
         experience = []
-        doc = nlp(self.text)
-        for sent in doc.sents:
-            if re.search(r'(\bexperience\b|\bworked at\b|\bposition\b|\brole\b|\bcompany\b)', sent.text, re.IGNORECASE):
-                experience.append(sent.text.strip())
+        # Split by . ! ?
+        sentences = re.split(r'[.!?]+', self.text)
+        for sent in sentences:
+            sent = sent.strip()
+            if sent and re.search(r'(\bexperience\b|\bworked at\b|\bposition\b|\brole\b|\bcompany\b)', sent, re.IGNORECASE):
+                experience.append(sent)
         return experience
 
     def extract_projects(self) -> List[str]:
         # Look for project sections or keywords
         projects = []
-        doc = nlp(self.text)
-        for sent in doc.sents:
-            if re.search(r'(project|developed|built|created|designed)', sent.text, re.IGNORECASE):
-                projects.append(sent.text.strip())
+        sentences = re.split(r'[.!?]+', self.text)
+        for sent in sentences:
+            sent = sent.strip()
+            if sent and re.search(r'(project|developed|built|created|designed)', sent, re.IGNORECASE):
+                projects.append(sent)
         return projects
 
     def extract_technologies(self) -> List[str]:

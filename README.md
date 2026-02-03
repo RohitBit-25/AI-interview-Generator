@@ -38,7 +38,17 @@ Run the Streamlit app:
 ```bash
 streamlit run app.py
 ```
-(Prop tip: The old CLI version is still available via `python main.py`)
+Or use the helper script (Mac/Linux):
+```bash
+./run.sh
+```
+
+## Testing
+To run the automated unit tests:
+```bash
+python run_tests.py
+```
+
 
 ## Developer Guide
 - `app.py`: Main Streamlit application entry point.
