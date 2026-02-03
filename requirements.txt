@@ -4,3 +4,6 @@ pdfminer.six
 streamlit
 google-generativeai
 gTTS
+python-dotenv
+SpeechRecognition
+streamlit-mic-recorder
