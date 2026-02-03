@@ -2,3 +2,5 @@ nltk
 spacy
 pdfminer.six
 streamlit
+google-generativeai
+gTTS
