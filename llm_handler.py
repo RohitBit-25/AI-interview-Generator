@@ -70,12 +70,84 @@ class LLMHandler:
         Evaluate the answer. valid points, missing concepts, and improvement tips.
         Return ONLY a raw JSON object:
         {{
-            "rating": <0-10 score>,
+            "rating": <0-10 score integer>,
             "feedback": "Your constructive feedback here.",
             "better_answer": "An example of a stronger answer."
         }}
         """
         
+        return self._generate_json(prompt)
+
+    def analyze_jd_gap(self, resume_text: str, jd_text: str) -> Dict[str, Any]:
+        """
+        Analyzes the gap between Resume and Job Description.
+        """
+        if not self.is_configured(): return {}
+        
+        prompt = f"""
+        Compare the Resume and Job Description (JD).
+        Resume: {resume_text[:2000]}
+        JD: {jd_text[:2000]}
+        
+        Identify 3 critical missing skills or gaps.
+        Generate 3 interview questions regarding these gaps.
+        
+        Return ONLY JSON:
+        {{
+            "missing_skills": ["Skill1", "Skill2"],
+            "analysis": "Brief analysis of fit.",
+            "questions": [
+                {{"question": "Q1 about missing skill", "type": "Gap Analysis", "topic": "Skill1"}},
+                {{"question": "Q2 about missing skill", "type": "Gap Analysis", "topic": "Skill2"}}
+            ]
+        }}
+        """
+        return self._generate_json(prompt)
+
+    def review_code(self, problem: str, user_code: str) -> Dict[str, Any]:
+        """
+        Reviews a coding solution.
+        """
+        if not self.is_configured(): return {}
+        
+        prompt = f"""
+        Review this python code for the problem: "{problem}".
+        User Code:
+        {user_code}
+        
+        Analyze Time Complexity, Space Complexity, and Correctness.
+        Return ONLY JSON:
+        {{
+            "is_correct": true/false,
+            "rating": <0-10>,
+            "feedback": "Code review comments.",
+            "time_complexity": "O(n)",
+            "optimized_code": "Better version if applicable"
+        }}
+        """
+        return self._generate_json(prompt)
+
+    def analyze_star(self, question: str, answer: str) -> Dict[str, Any]:
+        """
+        Checks if the answer follows STAR method.
+        """
+        if not self.is_configured(): return {}
+        
+        prompt = f"""
+        Analyze if this answer follows S.T.A.R. (Situation, Task, Action, Result) format.
+        Question: {question}
+        Answer: {answer}
+        
+        Return ONLY JSON:
+        {{
+            "star_score": <0-10>,
+            "missing_components": ["Result", "Action"],
+            "feedback": "Feedback on structure."
+        }}
+        """
+        return self._generate_json(prompt)
+
+    def _generate_json(self, prompt: str) -> Any:
         try:
             response = self.model.generate_content(prompt)
             text = response.text.strip()
@@ -85,4 +157,5 @@ class LLMHandler:
                 text = text[3:-3]
             return json.loads(text)
         except Exception as e:
-             return {"feedback": f"Error evaluating: {e}", "rating": 0}
+            print(f"LLM Error: {e}")
+            return {}
