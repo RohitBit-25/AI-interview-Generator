@@ -48,7 +48,30 @@ def main():
                     # Cleanup temp file
                     os.unlink(temp_path)
                     
-                    # Display Extracted Info (Collapsible)
+                    # --- RESUME ANALYSIS SIDEBAR ---
+                    st.sidebar.divider()
+                    st.sidebar.subheader("📊 Resume Score")
+                    
+                    # Analyze Quality
+                    analysis = parser.analyze_quality()
+                    score = analysis['score']
+                    
+                    # Display Circular Progress or Bar
+                    if score >= 80:
+                         st.sidebar.success(f"Excellent! {score}/100")
+                    elif score >= 50:
+                         st.sidebar.warning(f"Good, but needs work. {score}/100")
+                    else:
+                         st.sidebar.error(f"Needs Improvement. {score}/100")
+                    
+                    st.sidebar.progress(score / 100)
+                    
+                    if analysis['feedback']:
+                        with st.sidebar.expander("Improvement Tips"):
+                            for tip in analysis['feedback']:
+                                st.write(f"- {tip}")
+
+                    # --- DETAILED PARSING ---
                     with st.expander("📄 Parsed Resume Details", expanded=False):
                         col1, col2 = st.columns(2)
                         with col1:
@@ -62,22 +85,32 @@ def main():
                             st.subheader("Project Keywords")
                             st.write(f"Found related keywords in {len(parsed_resume.get('projects', []))} sections.")
 
-                    # Generate Questions
+                    # --- QUESTION GENERATION ---
                     st.divider()
                     st.header(f"📝 Generated Interview Questions ({difficulty})")
                     
                     qgen = QuestionGenerator(parsed_resume)
                     questions = qgen.generate_all_questions(difficulty)
                     
+                    # Store answers for export
+                    if 'interview_log' not in st.session_state:
+                         st.session_state.interview_log = {}
+
                     if not questions:
                         st.warning("Could not generate specific questions. Ensure your resume has clear 'Skills' or 'Projects' sections.")
                     else:
+                        full_transcript = f"AI Interview Session - {difficulty} Level\n\n"
+                        
                         for i, q_data in enumerate(questions):
                             st.subheader(f"Q{i+1}: {q_data['question']}")
                             st.caption(f"Topic: {q_data.get('topic', 'General')} | Type: {q_data.get('type', 'General')}")
                             
                             # Answer Area
-                            user_answer = st.text_area(f"Your Answer for Q{i+1}:", key=f"ans_{i}", height=100)
+                            user_ans = st.text_area(f"Your Answer for Q{i+1}:", key=f"ans_{i}", height=100)
+                            
+                            # Update Transcript
+                            full_transcript += f"Q{i+1}: {q_data['question']}\n"
+                            full_transcript += f"Your Answer: {user_ans if user_ans else '(No Answer)'}\n"
                             
                             # Hints / Answer Key
                             with st.expander("💡 Reveal Answer Key / Hints"):
@@ -85,10 +118,20 @@ def main():
                                     st.markdown("### Key Talking Points:")
                                     for hint in q_data['hints']:
                                         st.markdown(f"- {hint}")
+                                        full_transcript += f"  - Hint: {hint}\n"
                                 else:
                                     st.info("No specific answer key available for this custom question.")
                             
+                            full_transcript += "-" * 40 + "\n\n"
                             st.divider()
+                        
+                        # --- EXPORT BUTTON ---
+                        st.download_button(
+                            label="📥 Download Interview Transcript",
+                            data=full_transcript,
+                            file_name="interview_transcript.txt",
+                            mime="text/plain"
+                        )
                             
                 except Exception as e:
                     st.error(f"An error occurred: {e}")

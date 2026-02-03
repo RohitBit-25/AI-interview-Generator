@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict
+from typing import List, Dict, Any
 from pdfminer.high_level import extract_text
 import spacy
 
