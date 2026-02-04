@@ -1,7 +1,7 @@
 nltk
 pdfminer.six
 streamlit
-google-generativeai
+groq
 gTTS
 python-dotenv
 SpeechRecognition

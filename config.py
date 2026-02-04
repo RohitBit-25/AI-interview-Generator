@@ -5,11 +5,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY")
     
     # Defaults
-    DEFAULT_MODEL = "gemini-1.5-flash-latest"
+    DEFAULT_MODEL = "llama3-70b-8192"
     
     @staticmethod
     def get_api_key():
-        return Config.GEMINI_API_KEY
+        return Config.GROQ_API_KEY
