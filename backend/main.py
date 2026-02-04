@@ -77,6 +77,8 @@ async def generate_questions(req: QuestionRequest):
         raise HTTPException(status_code=500, detail="LLM not configured")
     
     questions = llm.generate_questions(req.resume_text, req.role, req.difficulty, req.count)
+    if not questions:
+         raise HTTPException(status_code=500, detail="Failed to generate questions. LLM returned empty response.")
     return {"questions": questions}
 
 @app.post("/api/evaluate")
