@@ -98,6 +98,23 @@ class LLMHandler:
         """
         return self._generate_json(prompt)
 
+    def generate_coding_problem(self, resume_text: str, role: str) -> Dict[str, Any]:
+        """Generates a coding problem based on resume skills."""
+        if not self.is_configured(): return {}
+        prompt = f"""
+        Generate a coding interview problem for a {role} candidate based on this resume:
+        {resume_text[:2000]}
+        
+        Return JSON: 
+        {{
+            "title": "Problem Title",
+            "description": "Detailed problem description...",
+            "difficulty": "Easy/Medium/Hard",
+            "starter_code": "def solution():\\n    pass"
+        }}
+        """
+        return self._generate_json(prompt)
+
     def review_code(self, problem: str, user_code: str) -> Dict[str, Any]:
         if not self.is_configured(): return {}
         prompt = f"""
