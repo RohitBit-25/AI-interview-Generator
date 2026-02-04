@@ -148,12 +148,6 @@ export default function InterviewPage() {
                             </div>
                         ) : (
                             <div className="relative">
-                                <Input
-                                    placeholder="Type your answer here..."
-                                    className="h-32 pb-24 align-top" // Hack for textarea-like look with Input if Textarea component not ready, or just use Input if short. Shadcn Input is usually single line.
-                                // Ideally we should use Textarea component. I'll use standard <textarea> styled like input for now or assume Input handles it.
-                                // Actually Shadcn has a Textarea component, but I haven't added it. I'll just use a standard textarea with Tailwind classes matching Input.
-                                />
                                 <textarea
                                     className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                     placeholder="Type your answer here... (be detailed)"

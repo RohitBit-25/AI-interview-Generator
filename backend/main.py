@@ -5,6 +5,9 @@ from typing import List, Optional
 import shutil
 import os
 import sys
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Add parent directory to path to import existing modules
 sys.path.append("..") 
