@@ -157,6 +157,21 @@ async def generate_quiz_endpoint(req: QuizRequest):
         raise HTTPException(status_code=500, detail="LLM not configured")
     return {"questions": llm.generate_quiz(req.skills)}
 
+class ProblemRequest(BaseModel):
+    resume_text: str
+    role: str = "Software Engineer"
+
+@app.post("/api/arena/problem")
+async def generate_problem_endpoint(req: ProblemRequest):
+    if not llm.is_configured():
+         return {
+             "title": "Two Sum", 
+             "description": "Given array, find pairs...", 
+             "difficulty": "Easy", 
+             "starter_code": "def two_sum(nums, target): pass"
+         }
+    return llm.generate_coding_problem(req.resume_text, req.role)
+
 @app.post("/api/arena/submit")
 async def submit_arena_code(req: ArenaRequest):
     if not llm.is_configured():
