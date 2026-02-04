@@ -97,3 +97,39 @@ async def get_dashboard():
         return []
     # Convert to list of dicts for JSON
     return df.to_dict(orient="records")
+
+# Voice Handling
+from fastapi.responses import FileResponse
+from voice_handler import VoiceHandler
+
+voice_handler = VoiceHandler()
+
+class SpeakRequest(BaseModel):
+    text: str
+
+@app.post("/api/speak")
+async def speak(req: SpeakRequest):
+    audio_path = voice_handler.generate_audio(req.text)
+    if not audio_path:
+        raise HTTPException(status_code=500, detail="Audio generation failed")
+    return FileResponse(audio_path, media_type="audio/mpeg", filename="speech.mp3")
+
+@app.post("/api/listen")
+async def listen(file: UploadFile = File(...)):
+    print(f"Received audio upload: {file.filename}")
+    try:
+        # Save temp audio file
+        temp_file = f"temp_{file.filename}"
+        with open(temp_file, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        # Transcribe
+        text = voice_handler.transcribe_audio(temp_file)
+        
+        # Cleanup
+        os.remove(temp_file)
+        
+        return {"text": text}
+    except Exception as e:
+        print(f"Listen error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
