@@ -1,7 +1,8 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import shutil
 import os
 import sys
@@ -15,13 +16,14 @@ from resume_parser import ResumeParser
 from llm_handler import LLMHandler
 from config import Config
 from db_handler import DBHandler
+from voice_handler import VoiceHandler
 
 app = FastAPI(title="AI Interview Assistant API")
 
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Allow all origins for dev
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,6 +33,7 @@ app.add_middleware(
 API_KEY = Config.get_api_key()
 llm = LLMHandler(API_KEY)
 db = DBHandler()
+voice_handler = VoiceHandler()
 
 # Models
 class QuestionRequest(BaseModel):
@@ -42,6 +45,25 @@ class QuestionRequest(BaseModel):
 class AnswerRequest(BaseModel):
     question: str
     user_answer: str
+
+class SpeakRequest(BaseModel):
+    text: str
+
+class StartInterviewRequest(BaseModel):
+    resume_text: str
+    role: str = "Software Engineer"
+
+class NextQuestionRequest(BaseModel):
+    resume_text: str
+    history: List[Dict[str, Any]]
+    last_answer: str
+
+class QuizRequest(BaseModel):
+    skills: List[str]
+
+class ArenaRequest(BaseModel):
+    problem: str
+    code: str
 
 @app.get("/")
 def read_root():
@@ -56,7 +78,6 @@ async def upload_resume(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
         
         parser = ResumeParser(temp_file)
-        # Simplify extraction for now
         data = {
             "text": parser.text,
             "skills": parser.extract_skills(),
@@ -64,7 +85,6 @@ async def upload_resume(file: UploadFile = File(...)):
             "projects": parser.extract_projects()
         }
         
-        # Cleanup
         os.remove(temp_file)
         return {"status": "success", "data": data}
     except Exception as e:
@@ -72,40 +92,22 @@ async def upload_resume(file: UploadFile = File(...)):
 
 @app.post("/api/generate-questions")
 async def generate_questions(req: QuestionRequest):
-    print(f"Generating questions for role: {req.role}")
     if not llm.is_configured():
         raise HTTPException(status_code=500, detail="LLM not configured")
-    
     questions = llm.generate_questions(req.resume_text, req.role, req.difficulty, req.count)
-    if not questions:
-         raise HTTPException(status_code=500, detail="Failed to generate questions. LLM returned empty response.")
     return {"questions": questions}
 
 @app.post("/api/evaluate")
 async def evaluate_answer(req: AnswerRequest):
-    print(f"Evaluating answer for: {req.question[:50]}...")
     if not llm.is_configured():
         raise HTTPException(status_code=500, detail="LLM not configured")
-    
-    feedback = llm.evaluate_answer(req.question, req.user_answer)
-    return feedback
+    return llm.evaluate_answer(req.question, req.user_answer)
 
 @app.get("/api/dashboard")
 async def get_dashboard():
     df = db.get_analytics()
-    if df.empty:
-        return []
-    # Convert to list of dicts for JSON
+    if df.empty: return []
     return df.to_dict(orient="records")
-
-# Voice Handling
-from fastapi.responses import FileResponse
-from voice_handler import VoiceHandler
-
-voice_handler = VoiceHandler()
-
-class SpeakRequest(BaseModel):
-    text: str
 
 @app.post("/api/speak")
 async def speak(req: SpeakRequest):
@@ -116,46 +118,25 @@ async def speak(req: SpeakRequest):
 
 @app.post("/api/listen")
 async def listen(file: UploadFile = File(...)):
-    print(f"Received audio upload: {file.filename}")
     try:
-        # Save temp audio file
         temp_file = f"temp_{file.filename}"
         with open(temp_file, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-            
-        # Transcribe
         text = voice_handler.transcribe_audio(temp_file)
-        
-        # Cleanup
         os.remove(temp_file)
-        
         return {"text": text}
     except Exception as e:
-        print(f"Listen error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-# Dynamic Interview Endpoints
-class StartInterviewRequest(BaseModel):
-    resume_text: str
-    role: str = "Software Engineer"
-
-class NextQuestionRequest(BaseModel):
-    resume_text: str
-    history: List[Dict[str, Any]] # List of previous QA
-    last_answer: str
 
 @app.post("/api/interview/start")
 async def start_interview_endpoint(req: StartInterviewRequest):
-    print(f"Starting dynamic interview for role: {req.role}")
     if not llm.is_configured():
-         # Mock response if LLM failed/offline
          return {
              "question": "Tell me about yourself and your experience with Python.",
              "type": "Behavioral",
              "topic": "Introduction",
-             "hints": ["Keep it brief", "Highlight key projects"]
+             "hints": ["Keep it brief"]
          }
-         
     response = llm.start_interview(req.resume_text, req.role)
     if not response:
         raise HTTPException(status_code=500, detail="Failed to start interview")
@@ -163,11 +144,21 @@ async def start_interview_endpoint(req: StartInterviewRequest):
 
 @app.post("/api/interview/next")
 async def next_question_endpoint(req: NextQuestionRequest):
-    print(f"Processing answer and generating next question...")
     if not llm.is_configured():
         raise HTTPException(status_code=500, detail="LLM not configured")
-        
     response = llm.continue_interview(req.resume_text, req.history, req.last_answer)
     if not response:
         raise HTTPException(status_code=500, detail="Failed to continue interview")
     return response
+
+@app.post("/api/quiz")
+async def generate_quiz_endpoint(req: QuizRequest):
+    if not llm.is_configured():
+        raise HTTPException(status_code=500, detail="LLM not configured")
+    return {"questions": llm.generate_quiz(req.skills)}
+
+@app.post("/api/arena/submit")
+async def submit_arena_code(req: ArenaRequest):
+    if not llm.is_configured():
+        raise HTTPException(status_code=500, detail="LLM not configured")
+    return llm.review_code(req.problem, req.code)
