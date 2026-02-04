@@ -3,8 +3,6 @@ from typing import List, Dict, Any
 from pdfminer.high_level import extract_text
 import utils
 
-# nlp = spacy.load('en_core_web_sm') # Removed due to Python 3.14 incompatibility
-
 class ResumeParser:
     def __init__(self, resume_path: str):
         self.resume_path = resume_path

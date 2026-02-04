@@ -25,12 +25,90 @@ voice = VoiceHandler()
 db = DBHandler()
 
 # Custom CSS
+# Custom CSS - Premium UI
 st.markdown("""
 <style>
-    .stApp { background-color: #f8f9fa; }
-    .main-header { font-size: 2.2rem; color: #1e3a8a; font-weight: 800; text-align: center; margin-bottom: 1rem; }
-    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    .big-stat { font-size: 2rem; font-weight: bold; color: #2563eb; }
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Main Background */
+    .stApp {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+    }
+
+    /* Sidebar Styling */
+    section[data-testid="stSidebar"] {
+        background-color: #ffffff !important;
+        border-right: 1px solid #e2e8f0;
+    }
+
+    /* Card Styling */
+    .card {
+        background: white !important;
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        margin-bottom: 24px;
+        transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    /* Typography */
+    h1, h2, h3 {
+        color: #1e293b !important;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+    }
+    
+    /* Buttons */
+    .stButton button {
+        background: linear-gradient(to right, #2563eb, #3b82f6) !important;
+        color: white !important;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .stButton button:hover {
+        background: linear-gradient(to right, #1d4ed8, #2563eb) !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        transform: scale(1.02);
+    }
+    
+    /* Metrics */
+    div[data-testid="stMetricValue"] {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #2563eb !important;
+    }
+    
+    /* Inputs */
+    .stTextArea textarea {
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        padding: 1rem;
+    }
+    .stTextArea textarea:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    /* Status Messages */
+    .stSuccess {
+        background-color: #f0fdf4 !important;
+        border-left: 4px solid #22c55e !important;
+    }
+    .stInfo {
+        background-color: #eff6ff !important;
+        border-left: 4px solid #3b82f6 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
