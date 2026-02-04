@@ -40,7 +40,8 @@ export default function Home() {
         setProgress((prev) => (prev >= 90 ? 90 : prev + 10))
       }, 200)
 
-      const response = await axios.post("http://127.0.0.1:8000/api/upload", formData, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+      const response = await axios.post(`${apiUrl}/api/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
 

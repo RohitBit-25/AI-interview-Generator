@@ -38,7 +38,8 @@ export default function InterviewPage() {
             const data = JSON.parse(resumeData)
             try {
                 // Generate questions based on resume text
-                const response = await axios.post("http://127.0.0.1:8000/api/generate-questions", {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+                const response = await axios.post(`${apiUrl}/api/generate-questions`, {
                     resume_text: data.text,
                     role: "Software Engineer", // Default for now, could be dynamic
                     difficulty: "Medium",
@@ -66,7 +67,8 @@ export default function InterviewPage() {
         setEvaluating(true)
         try {
             const currentQ = questions[currentIndex]
-            const response = await axios.post("http://127.0.0.1:8000/api/evaluate", {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+            const response = await axios.post(`${apiUrl}/api/evaluate`, {
                 question: currentQ.question,
                 user_answer: userAnswer
             })

@@ -49,6 +49,7 @@ def read_root():
 
 @app.post("/api/upload")
 async def upload_resume(file: UploadFile = File(...)):
+    print(f"Received file upload: {file.filename}")
     try:
         temp_file = f"temp_{file.filename}"
         with open(temp_file, "wb") as buffer:
@@ -71,6 +72,7 @@ async def upload_resume(file: UploadFile = File(...)):
 
 @app.post("/api/generate-questions")
 async def generate_questions(req: QuestionRequest):
+    print(f"Generating questions for role: {req.role}")
     if not llm.is_configured():
         raise HTTPException(status_code=500, detail="LLM not configured")
     
@@ -79,6 +81,7 @@ async def generate_questions(req: QuestionRequest):
 
 @app.post("/api/evaluate")
 async def evaluate_answer(req: AnswerRequest):
+    print(f"Evaluating answer for: {req.question[:50]}...")
     if not llm.is_configured():
         raise HTTPException(status_code=500, detail="LLM not configured")
     
