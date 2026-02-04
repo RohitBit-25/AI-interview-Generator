@@ -133,3 +133,41 @@ async def listen(file: UploadFile = File(...)):
     except Exception as e:
         print(f"Listen error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# Dynamic Interview Endpoints
+class StartInterviewRequest(BaseModel):
+    resume_text: str
+    role: str = "Software Engineer"
+
+class NextQuestionRequest(BaseModel):
+    resume_text: str
+    history: List[Dict[str, Any]] # List of previous QA
+    last_answer: str
+
+@app.post("/api/interview/start")
+async def start_interview_endpoint(req: StartInterviewRequest):
+    print(f"Starting dynamic interview for role: {req.role}")
+    if not llm.is_configured():
+         # Mock response if LLM failed/offline
+         return {
+             "question": "Tell me about yourself and your experience with Python.",
+             "type": "Behavioral",
+             "topic": "Introduction",
+             "hints": ["Keep it brief", "Highlight key projects"]
+         }
+         
+    response = llm.start_interview(req.resume_text, req.role)
+    if not response:
+        raise HTTPException(status_code=500, detail="Failed to start interview")
+    return response
+
+@app.post("/api/interview/next")
+async def next_question_endpoint(req: NextQuestionRequest):
+    print(f"Processing answer and generating next question...")
+    if not llm.is_configured():
+        raise HTTPException(status_code=500, detail="LLM not configured")
+        
+    response = llm.continue_interview(req.resume_text, req.history, req.last_answer)
+    if not response:
+        raise HTTPException(status_code=500, detail="Failed to continue interview")
+    return response

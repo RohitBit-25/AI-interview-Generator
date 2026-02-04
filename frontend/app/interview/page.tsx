@@ -160,21 +160,21 @@ export default function InterviewPage() {
         return (
             <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                <p className="mt-4 text-slate-500">Preparing your interview...</p>
+                <p className="mt-4 text-slate-500">Starting your AI interview...</p>
             </div>
         )
     }
 
-    const currentQ = questions[currentIndex]
+    if (!currentQuestion) return null
 
     return (
         <main className="flex min-h-screen flex-col items-center bg-slate-50 p-4 md:p-8">
             <div className="w-full max-w-2xl">
                 <header className="mb-8 flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Mock Interview</h1>
+                        <h1 className="text-2xl font-bold text-slate-900">AI Interview Session</h1>
                         <p className="text-sm text-slate-500">
-                            Question {currentIndex + 1} of {questions.length}
+                            Dynamic Conversation • {history.length / 2 + 1} Qs
                         </p>
                     </div>
                     <div className="text-right">
@@ -186,17 +186,15 @@ export default function InterviewPage() {
                     <Avatar isSpeaking={isSpeaking} emotion={evaluating ? "thinking" : feedback ? "happy" : "neutral"} />
                 </div>
 
-                <Progress value={((currentIndex) / questions.length) * 100} className="mb-8 h-2" />
-
                 <Card className="mb-6 shadow-md transition-all">
                     <CardHeader>
                         <div className="mb-2 flex items-center space-x-2">
                             <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                                {currentQ.type}
+                                {currentQuestion.type}
                             </span>
-                            <span className="text-xs text-slate-500">• {currentQ.topic}</span>
+                            <span className="text-xs text-slate-500">• {currentQuestion.topic}</span>
                         </div>
-                        <CardTitle className="text-xl leading-snug">{currentQ.question}</CardTitle>
+                        <CardTitle className="text-xl leading-snug">{currentQuestion.question}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {feedback ? (
@@ -241,7 +239,7 @@ export default function InterviewPage() {
                         {!feedback && (
                             <Button
                                 variant="outline"
-                                onClick={() => playAudio(currentQ.question)}
+                                onClick={() => playAudio(currentQuestion.question)}
                                 disabled={isSpeaking || evaluating}
                                 className="w-12 h-10 px-0"
                                 title="Read Question"
@@ -272,7 +270,7 @@ export default function InterviewPage() {
 
                 {!feedback && (
                     <div className="mt-4 text-center">
-                        <p className="text-xs text-slate-400">Hints: {currentQ.hints.join(", ")}</p>
+                        <p className="text-xs text-slate-400">Hints: {currentQuestion.hints.join(", ")}</p>
                     </div>
                 )}
             </div>
