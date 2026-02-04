@@ -8,8 +8,6 @@ import { Loader2, Send, CheckCircle2, AlertTriangle, ArrowRight, Mic, MicOff, Vo
 import { Button } from "@/components/ui/button"
 import { Avatar } from "@/components/Avatar"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Progress } from "@/components/ui/progress"
 
 interface Question {
     question: string
@@ -21,8 +19,8 @@ interface Question {
 export default function InterviewPage() {
     const router = useRouter()
     const [loading, setLoading] = useState(true)
-    const [questions, setQuestions] = useState<Question[]>([])
-    const [currentIndex, setCurrentIndex] = useState(0)
+    const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
+    const [history, setHistory] = useState<any[]>([])
     const [userAnswer, setUserAnswer] = useState("")
     const [feedback, setFeedback] = useState<any>(null)
     const [evaluating, setEvaluating] = useState(false)
@@ -43,23 +41,27 @@ export default function InterviewPage() {
 
             const data = JSON.parse(resumeData)
             try {
-                // Generate questions based on resume text
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
-                const response = await axios.post(`${apiUrl}/api/generate-questions`, {
+                const response = await axios.post(`${apiUrl}/api/interview/start`, {
                     resume_text: data.text,
-                    role: "Software Engineer",
-                    difficulty: "Medium",
-                    count: 3
+                    role: "Software Engineer"
                 })
 
-                setQuestions(response.data.questions)
+                setCurrentQuestion(response.data.question ? response.data : {
+                    question: response.data.question,
+                    type: response.data.type,
+                    topic: response.data.topic,
+                    hints: response.data.hints
+                })
                 setLoading(false)
             } catch (error) {
-                console.error("Error generating questions:", error)
-                // Fallback/Mock for demo if API fails
-                setQuestions([
-                    { question: "Could you tell me a little bit about yourself?", type: "Behavioral", topic: "Intro", hints: ["Elevator pitch"] }
-                ])
+                console.error("Error starting interview:", error)
+                setCurrentQuestion({
+                    question: "Tell me about yourself.",
+                    type: "Intro",
+                    topic: "Behavioral",
+                    hints: ["Be concise"]
+                })
                 setLoading(false)
             }
         }
@@ -72,31 +74,63 @@ export default function InterviewPage() {
 
         setEvaluating(true)
         try {
-            const currentQ = questions[currentIndex]
+            const resumeData = JSON.parse(localStorage.getItem("resumeData") || "{}")
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
-            const response = await axios.post(`${apiUrl}/api/evaluate`, {
-                question: currentQ.question,
-                user_answer: userAnswer
+
+            // For dynamic interview, we send the answer to get the NEXT question
+            // But first we want to show feedback for THIS answer.
+            // So we might need to split this or trust the backend to do both.
+            // The backend /next endpoint returns evaluation AND next_question.
+
+            const response = await axios.post(`${apiUrl}/api/interview/next`, {
+                resume_text: resumeData.text,
+                history: history,
+                last_answer: userAnswer
             })
 
-            setFeedback(response.data)
-            if (response.data.rating >= 7) {
+            const data = response.data
+
+            // Construct the complete feedback object including the next question pointer
+            // This ensures state update is atomic and complete
+            const feedbackData = {
+                ...data.evaluation,
+                next_question: data.next_question
+            }
+
+            setFeedback(feedbackData)
+
+            // Update history with the current Q&A pair
+            setHistory(prev => [...prev, {
+                question: currentQuestion?.question,
+                answer: userAnswer,
+                feedback: data.evaluation
+            }])
+
+            if (data.evaluation && data.evaluation.rating >= 7) {
                 setScore(prev => prev + 1)
             }
+
+            // We NO LONGER need a second setFeedback call because we did it above.
+            // This prevents the race condition.
+
         } catch (error) {
             console.error("Evaluation error:", error)
-            setFeedback({ feedback: "Could not evaluate answer at this time.", rating: 0 })
+            setFeedback({
+                feedback: "Error connecting to AI. Please try again.",
+                rating: 0,
+                next_question: null
+            })
         }
         setEvaluating(false)
     }
 
     const handleNext = () => {
-        setFeedback(null)
-        setUserAnswer("")
-        if (currentIndex < questions.length - 1) {
-            setCurrentIndex(prev => prev + 1)
+        if (feedback?.next_question) {
+            setCurrentQuestion(feedback.next_question)
+            setUserAnswer("")
+            setFeedback(null)
         } else {
-            // Finish
+            // Either finished or error state, go to dashboard
             router.push("/dashboard")
         }
     }
@@ -121,11 +155,9 @@ export default function InterviewPage() {
 
     const toggleRecording = async () => {
         if (isListening) {
-            // Stop
             mediaRecorder?.stop()
             setIsListening(false)
         } else {
-            // Start
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
                 const recorder = new MediaRecorder(stream)
@@ -134,7 +166,6 @@ export default function InterviewPage() {
                 recorder.ondataavailable = (e) => chunks.push(e.data)
                 recorder.onstop = async () => {
                     const blob = new Blob(chunks, { type: 'audio/webm' })
-                    // Convert/Send to API
                     const formData = new FormData()
                     formData.append('file', blob, 'recording.webm')
 
@@ -174,7 +205,7 @@ export default function InterviewPage() {
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900">AI Interview Session</h1>
                         <p className="text-sm text-slate-500">
-                            Dynamic Conversation • {history.length / 2 + 1} Qs
+                            Dynamic Conversation • {history.length + 1} Qs
                         </p>
                     </div>
                     <div className="text-right">
@@ -207,7 +238,7 @@ export default function InterviewPage() {
                                 {feedback.better_answer && (
                                     <div className="mt-3 border-t border-slate-200 pt-2">
                                         <p className="text-xs font-semibold text-slate-500 uppercase">Suggested Answer</p>
-                                        <p className="text-xs text-slate-600 mt-1 italic">"{feedback.better_answer}"</p>
+                                        <p className="text-xs text-slate-600 mt-1 italic">&quot;{feedback.better_answer}&quot;</p>
                                     </div>
                                 )}
                             </div>
@@ -268,7 +299,7 @@ export default function InterviewPage() {
                     </CardFooter>
                 </Card>
 
-                {!feedback && (
+                {!feedback && currentQuestion.hints && (
                     <div className="mt-4 text-center">
                         <p className="text-xs text-slate-400">Hints: {currentQuestion.hints.join(", ")}</p>
                     </div>
