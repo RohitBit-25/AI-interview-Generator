@@ -135,8 +135,8 @@ export default function InterviewPage() {
     const handleNext = () => {
         // Enforce 10 question limit
         if (history.length >= 10) {
-            alert("Mission Complete! Redirecting to Debrief...")
-            router.push("/dashboard")
+            alert("Phase 1 Complete. Initializing Coding Arena Protocol...")
+            router.push("/arena")
             return
         }
 
