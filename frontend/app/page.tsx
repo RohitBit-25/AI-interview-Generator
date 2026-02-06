@@ -114,10 +114,22 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6 md:px-12 lg:px-24 bg-texture overflow-hidden">
-        {/* Abstract Shapes - Warm Colors */}
-        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-orange-200/40 rounded-full blur-3xl mix-blend-multiply animate-pulse pointer-events-none" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-teal-200/40 rounded-full blur-3xl mix-blend-multiply animate-pulse animation-delay-2000 pointer-events-none" />
+      <section className="relative pt-32 pb-24 px-6 md:px-12 lg:px-24 overflow-hidden">
+        {/* Background Texture & Mandala */}
+        <div className="absolute inset-0 bg-texture opacity-40 z-0" />
+        <div className="absolute inset-0 bg-jaali z-0" />
+
+        {/* Rotating Mandala - Large Background Element */}
+        <div className="absolute -top-[20%] -right-[15%] w-[800px] h-[800px] opacity-[0.08] animate-[spin_60s_linear_infinite] pointer-events-none z-0">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#f97316" d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,81.6,-46.6C91.4,-34.1,98.1,-19.2,95.8,-4.9C93.5,9.3,82.1,23,71.2,34.8C60.3,46.6,49.9,56.5,38.1,64.4C26.3,72.3,13.1,78.2,-0.5,79.1C-14.1,80,-28.3,75.9,-40.5,68.2C-52.8,60.5,-63.1,49.2,-71.3,36.5C-79.5,23.8,-85.6,9.7,-84.9,-4.1C-84.2,-17.8,-76.7,-31.2,-66.9,-42.6C-57.2,-54,-45.2,-63.4,-32.4,-71.6C-19.6,-79.8,-6,-86.8,6.8,-98.6L44.7,-76.4Z" transform="translate(100 100)" />
+          </svg>
+        </div>
+        <div className="absolute -bottom-[20%] -left-[15%] w-[600px] h-[600px] opacity-[0.06] animate-[spin_80s_linear_infinite_reverse] pointer-events-none z-0">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#14b8a6" d="M42.7,-72.8C54.8,-66.3,63.6,-53,70.9,-39.7C78.2,-26.4,84.1,-13.2,82.3,-1C80.5,11.2,71.1,22.4,62.1,33.3C53.1,44.2,44.5,54.8,33.9,62.1C23.3,69.4,10.7,73.4,-0.8,74.8C-12.3,76.2,-24.6,75,-36.4,68.7C-48.2,62.4,-59.5,51,-67.2,38.2C-74.9,25.4,-79.1,11.2,-75.8,-1.9C-72.5,-15,-61.8,-27,-51.7,-37.9C-41.6,-48.8,-32.2,-58.6,-21.2,-65.8C-10.2,-73,2.4,-77.6,15.7,-83.4L42.7,-72.8Z" transform="translate(100 100)" />
+          </svg>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -127,16 +139,16 @@ export default function Home() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-orange-200 shadow-sm mb-8 hover:shadow-md transition-shadow">
             <span className="flex h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
-            <span className="text-sm font-medium text-slate-600">v2.0 | India's #1 Career Copilot</span>
+            <span className="text-sm font-semibold tracking-wide text-orange-800 uppercase" style={{ fontFamily: 'var(--font-outfit)' }}>India's #1 Career Copilot</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-[1.1] text-slate-900">
-            Design Your Destiny<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-red-600 to-indigo-700">One Skill at a Time</span>
+          <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-8 leading-[1.0] text-slate-900" style={{ fontFamily: 'var(--font-eczar)' }}>
+            Design Your <span className="italic text-teal-700">Karma.</span><br />
+            <span className="text-saffron-gradient">Stitch Your Future.</span>
           </h1>
 
-          <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Every career is a tapestry. Upload your resume and let <strong>Kaushal.ai</strong> help you stitch together the perfect interview performance.
+          <p className="text-xl md:text-2xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
+            Like a tailored masterpiece, <strong className="text-orange-700 font-medium">Kaushal.ai</strong> weaves your skills into a narrative that recruiters can't ignore.
           </p>
         </motion.div>
 
@@ -148,12 +160,12 @@ export default function Home() {
           className="relative z-20 max-w-xl mx-auto"
         >
           {/* Decorative Stitch Border Container */}
-          <div className={`p-4 rounded-2xl bg-white shadow-2xl transition-all duration-300 stitch-border ${isDragging ? "ring-4 ring-orange-200 scale-[1.02]" : ""}`}>
+          <div className={`p-5 rounded-2xl bg-white/90 backdrop-blur-sm shadow-2xl transition-all duration-300 stitch-border ${isDragging ? "ring-4 ring-orange-200 scale-[1.02]" : ""}`}>
             <div
               onDragOver={onDragOver}
               onDragLeave={onDragLeave}
               onDrop={onDrop}
-              className="bg-orange-50/50 rounded-lg border-2 border-dashed border-orange-200 p-8 text-center hover:bg-orange-50 transition-colors cursor-pointer"
+              className="bg-orange-50/30 rounded-lg border-2 border-dashed border-orange-200/50 p-10 text-center hover:bg-orange-50/60 transition-colors cursor-pointer relative overflow-hidden"
             >
               <AnimatePresence mode="wait">
                 {file ? (
