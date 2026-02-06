@@ -94,6 +94,10 @@ export default function DashboardPage() {
                             <Zap className="w-4 h-4 fill-[#ffe600]" />
                             <span>STREAK: 3_DAYS</span>
                         </div>
+                        <Link href="/">
+                            <Button className="bg-cyan-950 text-cyan-400 border border-cyan-500 hover:bg-cyan-900 font-orbitron tracking-wide rounded-none h-10 px-6">
+                                <ArrowLeft className="mr-2 h-4 w-4" /> NEW_SESSION
+                            </Button>
                         </Link>
                         <Button onClick={handleDownloadReport} className="bg-cyan-950/50 text-cyan-400 border border-cyan-500/50 hover:bg-cyan-900 font-orbitron tracking-wide rounded-none h-10 px-4">
                             <FileDown className="mr-2 h-4 w-4" /> REPORT

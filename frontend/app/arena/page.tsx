@@ -174,7 +174,7 @@ export default function ArenaPage() {
                         </div>
                         <div className="flex-1 p-4 font-mono text-xs overflow-y-auto whitespace-pre-wrap">
                             {isRunning ? (
-                                <div className="text-cyan-400 animate-pulse">>> INITIATING_RUNTIME_ENVIRONMENT...</div>
+                                <div className="text-cyan-400 animate-pulse">&gt;&gt; INITIATING_RUNTIME_ENVIRONMENT...</div>
                             ) : output ? (
                                 <div className="text-slate-300">
                                     <span className="text-green-500">$ python main.py</span>
