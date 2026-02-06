@@ -13,3 +13,5 @@ streamlit-ace
 fastapi
 uvicorn
 python-multipart
+pydub
+ffmpeg-python
