@@ -159,6 +159,40 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex items-center gap-4 mb-6">
+                    <h2 className="text-2xl font-bold text-white font-orbitron tracking-wide">QUICK_ACCESS</h2>
+                    <div className="h-px flex-1 bg-gradient-to-r from-cyan-900 to-transparent" />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                    <Link href="/arena">
+                        <Card className="bg-[#0a0f1e]/40 border border-cyan-900/30 hover:bg-[#0a0f1e]/80 hover:border-cyan-500/50 transition-all rounded-none group cursor-pointer h-full">
+                            <CardContent className="p-6 flex items-center gap-6 h-full">
+                                <div className="p-4 bg-cyan-950/30 border border-cyan-500/30 rounded-none group-hover:bg-cyan-950/50 transition-colors">
+                                    <Terminal className="w-8 h-8 text-cyan-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white font-orbitron tracking-wide mb-1 group-hover:text-cyan-300 transition-colors">CODING_ARENA</h3>
+                                    <p className="text-sm text-cyan-100/60 font-mono">Launch standalone coding sandbox.</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </Link>
+                    <Link href="/quiz">
+                        <Card className="bg-[#0a0f1e]/40 border border-purple-900/30 hover:bg-[#0a0f1e]/80 hover:border-purple-500/50 transition-all rounded-none group cursor-pointer h-full">
+                            <CardContent className="p-6 flex items-center gap-6 h-full">
+                                <div className="p-4 bg-purple-950/30 border border-purple-500/30 rounded-none group-hover:bg-purple-950/50 transition-colors">
+                                    <Activity className="w-8 h-8 text-purple-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white font-orbitron tracking-wide mb-1 group-hover:text-purple-300 transition-colors">SKILL_QUIZ</h3>
+                                    <p className="text-sm text-purple-100/60 font-mono">Rapid-fire technical assessment.</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </Link>
+                </div>
+
+                <div className="flex items-center gap-4 mb-6">
                     <h2 className="text-2xl font-bold text-white font-orbitron tracking-wide">MISSION_LOGS</h2>
                     <div className="h-px flex-1 bg-gradient-to-r from-cyan-900 to-transparent" />
                 </div>
@@ -191,8 +225,8 @@ export default function DashboardPage() {
                                     </div>
 
                                     <div className={`shrink-0 flex flex-col items-center justify-center w-20 h-20 border-2 ${item.rating >= 7
-                                            ? 'bg-green-950/20 text-green-400 border-green-500/50'
-                                            : 'bg-red-950/20 text-red-400 border-red-500/50'
+                                        ? 'bg-green-950/20 text-green-400 border-green-500/50'
+                                        : 'bg-red-950/20 text-red-400 border-red-500/50'
                                         }`}>
                                         <span className="text-3xl font-bold font-orbitron">{item.rating}</span>
                                         <span className="text-[10px] uppercase font-bold tracking-widest opacity-70">PTS</span>
