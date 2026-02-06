@@ -108,18 +108,55 @@ export default function ArenaPage() {
                 </div>
 
                 {/* Code Editor Panel */}
-                <div className="flex w-2/3 flex-col bg-black">
-                    <textarea
-                        className="flex-1 resize-none bg-black p-4 font-mono text-sm text-green-400 focus:outline-none"
-                        value={code}
-                        onChange={(e) => setCode(e.target.value)}
-                        spellCheck={false}
-                    />
-                    <div className="flex justify-end bg-slate-800 p-4">
-                        <Button onClick={handleSubmit} disabled={submitting} className="bg-purple-600 hover:bg-purple-700">
-                            {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
-                            Submit Code
-                        </Button>
+                <div className="flex w-2/3 flex-col bg-[#1e1e1e]">
+                    <div className="flex-1 relative overflow-hidden">
+                        <div className="absolute inset-0 flex">
+                            {/* Line Numbers */}
+                            <div className="w-12 bg-[#1e1e1e] border-r border-[#333] pt-4 text-right pr-3 text-slate-600 font-mono text-sm select-none">
+                                {code.split('\n').map((_, i) => (
+                                    <div key={i}>{i + 1}</div>
+                                ))}
+                            </div>
+                            {/* Simple Editor Implementation */}
+                            <textarea
+                                className="flex-1 resize-none bg-[#1e1e1e] p-4 pt-4 font-mono text-sm text-[#d4d4d4] focus:outline-none leading-relaxed"
+                                value={code}
+                                onChange={(e) => setCode(e.target.value)}
+                                spellCheck={false}
+                                placeholder="// Write your solution here..."
+                            />
+                        </div>
+                    </div>
+
+                    {/* Console / Output Area */}
+                    <div className="h-48 border-t border-[#333] bg-[#0d0d0d] flex flex-col">
+                        <div className="flex items-center justify-between px-4 py-2 border-b border-[#333] bg-[#1e1e1e]">
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Console Output</span>
+                            <div className="flex space-x-2">
+                                <Button size="sm" onClick={() => setReview(null)} variant="ghost" className="h-6 text-xs text-slate-500 hover:text-white">
+                                    Clear
+                                </Button>
+                            </div>
+                        </div>
+                        <div className="flex-1 p-4 font-mono text-xs overflow-y-auto">
+                            {submitting ? (
+                                <div className="text-yellow-500 animate-pulse">Running tests...</div>
+                            ) : review ? (
+                                <div className={review.is_correct ? "text-green-400" : "text-red-400"}>
+                                    {review.feedback ? `> ${review.feedback}` : "> Execution finished."}
+                                    <br />
+                                    {review.time_complexity && <span className="text-blue-400">{`> Time Complexity: ${review.time_complexity}`}</span>}
+                                </div>
+                            ) : (
+                                <span className="text-slate-600">{"> Ready to execute..."}</span>
+                            )}
+                        </div>
+                        <div className="p-4 border-t border-[#333] bg-[#1e1e1e] flex justify-end">
+                            <Button onClick={handleSubmit} disabled={submitting} className="bg-green-600 hover:bg-green-700 text-white px-6">
+                                {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
+                                Run Code & Submit
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>

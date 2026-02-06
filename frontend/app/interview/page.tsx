@@ -69,8 +69,9 @@ export default function InterviewPage() {
         startInterview()
     }, [router])
 
-    const handleSubmit = async () => {
-        if (!userAnswer.trim()) return
+    const handleSubmit = async (skipOrEvent: boolean | React.FormEvent = false) => {
+        const skip = typeof skipOrEvent === 'boolean' ? skipOrEvent : false;
+        if (!skip && !userAnswer.trim()) return
 
         setEvaluating(true)
         try {
@@ -85,7 +86,8 @@ export default function InterviewPage() {
             const response = await axios.post(`${apiUrl}/api/interview/next`, {
                 resume_text: resumeData.text,
                 history: history,
-                last_answer: userAnswer
+                last_answer: userAnswer,
+                skipped: skip
             })
 
             const data = response.data
@@ -227,75 +229,102 @@ export default function InterviewPage() {
                         </div>
                         <CardTitle className="text-xl leading-snug">{currentQuestion.question}</CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="space-y-6">
                         {feedback ? (
-                            <div className={`rounded-lg p-4 ${feedback.rating >= 7 ? 'bg-green-50 border border-green-100' : 'bg-amber-50 border border-amber-100'}`}>
-                                <div className="mb-2 flex items-center">
-                                    {feedback.rating >= 7 ? <CheckCircle2 className="mr-2 h-5 w-5 text-green-600" /> : <AlertTriangle className="mr-2 h-5 w-5 text-amber-600" />}
-                                    <span className="font-semibold text-slate-900">Feedback (Rating: {feedback.rating}/10)</span>
+                            <div className={`rounded-lg p-6 backdrop-blur-sm transition-all duration-500 ${feedback.rating >= 7 ? 'bg-green-50/50 border border-green-200' : 'bg-amber-50/50 border border-amber-200'}`}>
+                                <div className="mb-3 flex items-center">
+                                    {feedback.rating >= 7 ? <CheckCircle2 className="mr-2 h-6 w-6 text-green-600" /> : <AlertTriangle className="mr-2 h-6 w-6 text-amber-600" />}
+                                    <span className="font-bold text-lg text-slate-900">Feedback (Score: {feedback.rating}/10)</span>
                                 </div>
-                                <p className="text-sm text-slate-700">{feedback.feedback}</p>
+                                <p className="text-base leading-relaxed text-slate-700">{feedback.feedback}</p>
                                 {feedback.better_answer && (
-                                    <div className="mt-3 border-t border-slate-200 pt-2">
-                                        <p className="text-xs font-semibold text-slate-500 uppercase">Suggested Answer</p>
-                                        <p className="text-xs text-slate-600 mt-1 italic">&quot;{feedback.better_answer}&quot;</p>
+                                    <div className="mt-4 rounded-md bg-white/60 p-4">
+                                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">AI Suggested Answer</p>
+                                        <p className="text-sm text-slate-600 italic">"{feedback.better_answer}"</p>
                                     </div>
                                 )}
                             </div>
                         ) : (
-                            <div className="relative">
+                            <div className="relative group">
                                 <textarea
-                                    className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                    placeholder="Type your answer here... (be detailed)"
+                                    className="flex min-h-[160px] w-full rounded-xl border-slate-200 bg-white/50 px-4 py-3 text-base shadow-inner transition-all focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
+                                    placeholder="Type your answer here, or use the microphone..."
                                     value={userAnswer}
                                     onChange={(e) => setUserAnswer(e.target.value)}
                                     disabled={evaluating}
                                 />
+                                {isListening && (
+                                    <div className="absolute bottom-4 right-4 flex items-center space-x-1">
+                                        <div className="h-2 w-2 animate-bounce rounded-full bg-red-500"></div>
+                                        <div className="h-2 w-2 animate-bounce rounded-full bg-red-500 delay-75"></div>
+                                        <div className="h-2 w-2 animate-bounce rounded-full bg-red-500 delay-150"></div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </CardContent>
-                    <CardFooter className="flex justify-between items-center space-x-2">
-                        {/* Voice Controls */}
-                        {!feedback && (
+                    <CardFooter className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4">
+                        {/* Control Bar */}
+                        <div className="flex justify-center space-x-2">
                             <Button
-                                variant={isListening ? "destructive" : "secondary"}
+                                variant={isListening ? "destructive" : "outline"}
+                                size="icon"
                                 onClick={toggleRecording}
-                                disabled={evaluating}
-                                className="w-12 h-10 px-0"
-                                title="Toggle Microphone"
+                                disabled={evaluating || !!feedback}
+                                className={`rounded-full shadow-sm transition-all hover:scale-105 ${isListening ? "animate-pulse ring-4 ring-red-100" : ""}`}
+                                title={isListening ? "Stop Recording" : "Start Recording"}
                             >
                                 {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                             </Button>
-                        )}
-                        {!feedback && (
+
                             <Button
                                 variant="outline"
+                                size="icon"
                                 onClick={() => playAudio(currentQuestion.question)}
                                 disabled={isSpeaking || evaluating}
-                                className="w-12 h-10 px-0"
+                                className="rounded-full shadow-sm hover:scale-105"
                                 title="Read Question"
                             >
                                 <Volume2 className="h-4 w-4" />
                             </Button>
-                        )}
+                        </div>
 
-                        {feedback ? (
-                            <Button onClick={handleNext} className="flex-1">
-                                Next Question <ArrowRight className="ml-2 h-4 w-4" />
-                            </Button>
-                        ) : (
-                            <Button onClick={handleSubmit} disabled={!userAnswer || evaluating} className="flex-1">
-                                {evaluating ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Evaluating...
-                                    </>
-                                ) : (
-                                    <>
-                                        Submit Answer <Send className="ml-2 h-4 w-4" />
-                                    </>
-                                )}
-                            </Button>
-                        )}
+                        {/* Action Buttons */}
+                        <div className="flex space-x-3 w-full">
+                            {feedback ? (
+                                <Button onClick={handleNext} className="w-full text-lg h-12 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
+                                    Next Question <ArrowRight className="ml-2 h-5 w-5" />
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() => {
+                                            // Handle Skip
+                                            setEvaluating(true)
+                                            // Mock skip call logic (using basic next call with skip flag if backend supports, or just get next)
+                                            // Ideally we update handleSubmit to accept 'skip' param
+                                            handleSubmit(true)
+                                        }}
+                                        disabled={evaluating}
+                                        className="px-6 text-slate-500 hover:text-slate-700"
+                                    >
+                                        Skip
+                                    </Button>
+                                    <Button
+                                        onClick={() => handleSubmit(false)}
+                                        disabled={(!userAnswer && !isListening) || evaluating}
+                                        className="flex-1 text-lg h-12 rounded-xl shadow-md transition-all hover:-translate-y-0.5"
+                                    >
+                                        {evaluating ? (
+                                            <span className="flex items-center"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Analyzing...</span>
+                                        ) : (
+                                            <span className="flex items-center">Submit Answer <Send className="ml-2 h-4 w-4" /></span>
+                                        )}
+                                    </Button>
+                                </>
+                            )}
+                        </div>
                     </CardFooter>
                 </Card>
 

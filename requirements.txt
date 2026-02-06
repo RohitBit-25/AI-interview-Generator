@@ -10,3 +10,6 @@ fpdf
 pandas
 streamlit-lottie
 streamlit-ace
+fastapi
+uvicorn
+python-multipart
