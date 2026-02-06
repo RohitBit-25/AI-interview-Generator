@@ -38,8 +38,10 @@ try:
     API_KEY = config.Config.get_api_key()
     llm = LLMHandler(API_KEY)
     voice = VoiceHandler()
+    db = getattr(config, 'db', None) or DBHandler()
 except Exception as e:
     logger.error(f"Failed to initialize handlers: {e}")
+    db = DBHandler()
 
 # Models
 class InterviewStartRequest(BaseModel):
@@ -59,6 +61,13 @@ class ArenaProblemRequest(BaseModel):
 class ArenaSubmitRequest(BaseModel):
     problem: str
     code: str
+
+class QuizRequest(BaseModel):
+    skills: List[str]
+
+# Helpers
+import uuid
+SESSION_ID = str(uuid.uuid4()) # Simple session tracking for this run
 
 class QuizRequest(BaseModel):
     skills: List[str]
