@@ -15,6 +15,7 @@ from resume_parser import ResumeParser
 from question_generator import QuestionGenerator
 from llm_handler import LLMHandler
 from voice_handler import VoiceHandler
+from db_handler import DBHandler # Added
 import config
 
 # Setup Logging
