@@ -114,7 +114,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6 md:px-12 lg:px-24 bg-mandala overflow-hidden">
+      <section className="relative pt-32 pb-20 px-6 md:px-12 lg:px-24 bg-texture overflow-hidden">
         {/* Abstract Shapes - Warm Colors */}
         <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-orange-200/40 rounded-full blur-3xl mix-blend-multiply animate-pulse pointer-events-none" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-teal-200/40 rounded-full blur-3xl mix-blend-multiply animate-pulse animation-delay-2000 pointer-events-none" />
@@ -125,18 +125,18 @@ export default function Home() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center max-w-4xl mx-auto mb-16 relative z-10"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-orange-200 shadow-sm mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-orange-200 shadow-sm mb-8 hover:shadow-md transition-shadow">
             <span className="flex h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
             <span className="text-sm font-medium text-slate-600">v2.0 | India's #1 Career Copilot</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-[1.1] text-slate-900">
-            Master Your Career with <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-red-600 to-indigo-700">Detailed AI Analysis</span>
+            Design Your Destiny<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-red-600 to-indigo-700">One Skill at a Time</span>
           </h1>
 
           <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Upload your resume and let <strong>Kaushal.ai</strong> challenge you with role-specific interview simulation, rigorous coding tests, and direct feedback.
+            Every career is a tapestry. Upload your resume and let <strong>Kaushal.ai</strong> help you stitch together the perfect interview performance.
           </p>
         </motion.div>
 
@@ -147,12 +147,13 @@ export default function Home() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="relative z-20 max-w-xl mx-auto"
         >
-          <div className={`p-1 rounded-2xl bg-gradient-to-b from-white to-slate-50 shadow-2xl transition-all duration-300 ${isDragging ? "ring-4 ring-primary/20 scale-[1.02]" : ""}`}>
+          {/* Decorative Stitch Border Container */}
+          <div className={`p-4 rounded-2xl bg-white shadow-2xl transition-all duration-300 stitch-border ${isDragging ? "ring-4 ring-orange-200 scale-[1.02]" : ""}`}>
             <div
               onDragOver={onDragOver}
               onDragLeave={onDragLeave}
               onDrop={onDrop}
-              className="bg-white rounded-xl border border-dashed border-slate-300 p-8 text-center hover:border-primary/50 transition-colors"
+              className="bg-orange-50/50 rounded-lg border-2 border-dashed border-orange-200 p-8 text-center hover:bg-orange-50 transition-colors cursor-pointer"
             >
               <AnimatePresence mode="wait">
                 {file ? (
@@ -170,23 +171,25 @@ export default function Home() {
 
                     {loading ? (
                       <div className="space-y-3">
-                        <Progress value={progress} className="h-2" />
-                        <p className="text-xs text-slate-400 font-mono">EXTRACTING_SKILLS...</p>
+                        <div className="h-2 w-full bg-orange-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-orange-500 animate-shine w-full rounded-full origin-left" style={{ transform: `scaleX(${progress / 100})`, transition: 'transform 0.2s' }}></div>
+                        </div>
+                        <p className="text-xs text-orange-600 font-mono tracking-widest">WEAVING DATA...</p>
                       </div>
                     ) : uploadSuccess ? (
                       <div className="space-y-4">
-                        <div className="bg-indigo-50 border border-indigo-100 p-3 rounded-lg">
-                          <p className="text-xs text-indigo-500 uppercase font-bold tracking-wider mb-1">Detected Role</p>
-                          <p className="text-lg font-bold text-indigo-900">
+                        <div className="bg-white border border-orange-200 p-4 rounded-lg shadow-sm">
+                          <p className="text-xs text-orange-500 uppercase font-bold tracking-wider mb-1">Detected Role</p>
+                          <p className="text-lg font-bold text-slate-900">
                             {JSON.parse(localStorage.getItem("resumeData") || "{}").detected_role || "Software Engineer"}
                           </p>
                         </div>
-                        <Button onClick={() => router.push("/interview")} size="lg" className="w-full h-12 text-lg rounded-xl shadow-lg shadow-primary/25">
+                        <Button onClick={() => router.push("/interview")} size="lg" className="w-full h-12 text-lg rounded-xl shadow-lg bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white">
                           Start Interview <ArrowRight className="ml-2 w-5 h-5" />
                         </Button>
                       </div>
                     ) : (
-                      <Button onClick={handleUpload} size="lg" className="w-full h-12 text-lg rounded-xl shadow-lg shadow-primary/25">
+                      <Button onClick={handleUpload} size="lg" className="w-full h-12 text-lg rounded-xl shadow-lg bg-slate-900 text-white hover:bg-slate-800">
                         Analyze Resume <ArrowRight className="ml-2 w-5 h-5" />
                       </Button>
                     )}
@@ -198,7 +201,7 @@ export default function Home() {
                     exit={{ opacity: 0 }}
                     className="py-8"
                   >
-                    <div className="mx-auto w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-6 text-slate-400 group-hover:text-primary transition-colors">
+                    <div className="mx-auto w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 text-orange-500 shadow-md group-hover:scale-110 transition-transform">
                       <Upload className="w-8 h-8" />
                     </div>
                     <h3 className="text-lg font-semibold text-slate-900 mb-2">Drop your resume here</h3>
@@ -206,7 +209,7 @@ export default function Home() {
                     <Button
                       onClick={() => document.getElementById("resume-upload")?.click()}
                       variant="outline"
-                      className="rounded-full px-8"
+                      className="rounded-full px-8 border-orange-200 text-orange-700 hover:bg-orange-50"
                     >
                       Browse Files
                     </Button>
