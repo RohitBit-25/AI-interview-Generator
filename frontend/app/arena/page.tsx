@@ -14,6 +14,8 @@ export default function ArenaPage() {
     const [code, setCode] = useState("")
     const [review, setReview] = useState<any>(null)
     const [submitting, setSubmitting] = useState(false)
+    const [output, setOutput] = useState<string>("")
+    const [isRunning, setIsRunning] = useState(false)
 
     useEffect(() => {
         const fetchProblem = async () => {

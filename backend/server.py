@@ -278,6 +278,115 @@ async def log_interaction(req: LogRequest):
         logger.error(f"Log error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Phase 3: Advanced Features
+
+# 1. PDF Report Generation
+from fpdf import FPDF
+import tempfile
+
+class PDF(FPDF):
+    def header(self):
+        self.set_font('Arial', 'B', 15)
+        self.cell(80)
+        self.cell(30, 10, 'Kaushal.ai // Candidate Report', 0, 0, 'C')
+        self.ln(20)
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Arial', 'I', 8)
+        self.cell(0, 10, 'Page ' + str(self.page_no()) + '/{nb}', 0, 0, 'C')
+
+@app.get("/api/report/pdf")
+async def generate_pdf_report():
+    try:
+        # Fetch Data
+        df = db.get_analytics()
+        if df.empty:
+            raise HTTPException(status_code=404, detail="No data found for report")
+
+        pdf = PDF()
+        pdf.alias_nb_pages()
+        pdf.add_page()
+        pdf.set_font('Arial', '', 12)
+
+        # Candidate Details (Mock for now, or from resume data if we persisted it)
+        pdf.set_font('Arial', 'B', 12)
+        pdf.cell(0, 10, 'Candidate Performance Summary', 0, 1)
+        pdf.set_font('Arial', '', 12)
+        
+        # Calculate Stats
+        total_questions = len(df)
+        avg_score = df['rating'].mean()
+        pdf.cell(0, 10, f'Total Missions: {total_questions}', 0, 1)
+        pdf.cell(0, 10, f'Average Rating: {avg_score:.1f}/10', 0, 1)
+        pdf.ln(10)
+
+        # Performance Table
+        pdf.set_font('Arial', 'B', 10)
+        pdf.set_fill_color(200, 220, 255)
+        pdf.cell(100, 10, 'Question', 1, 0, 'L', 1)
+        pdf.cell(30, 10, 'Type', 1, 0, 'C', 1)
+        pdf.cell(20, 10, 'Score', 1, 0, 'C', 1)
+        pdf.cell(0, 10, 'Feedback', 1, 1, 'L', 1)
+
+        pdf.set_font('Arial', '', 9)
+        for _, row in df.iterrows():
+            q_text = (row['question'][:50] + '...') if len(row['question']) > 50 else row['question']
+            f_text = (row['feedback'][:40] + '...') if len(row['feedback']) > 40 else row['feedback']
+            
+            pdf.cell(100, 10, q_text, 1)
+            pdf.cell(30, 10, row.get('role', 'Gen'), 1, 0, 'C')
+            pdf.cell(20, 10, str(row['rating']), 1, 0, 'C')
+            pdf.cell(0, 10, f_text, 1, 1)
+
+        # Save to temp file
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+        pdf.output(temp_file.name)
+        
+        return FileResponse(temp_file.name, media_type="application/pdf", filename="kaushal_report.pdf")
+
+    except Exception as e:
+        logger.error(f"PDF Gen Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# 2. Interactive Code Execution (Piston API)
+import requests
+
+class CodeRunRequest(BaseModel):
+    code: str
+    language: str = "python"
+
+@app.post("/api/arena/run")
+async def run_code(req: CodeRunRequest):
+    try:
+        # Piston API (Public)
+        # https://emkc.org/api/v2/piston/execute
+        piston_url = "https://emkc.org/api/v2/piston/execute"
+        payload = {
+            "language": req.language,
+            "version": "3.10.0", # Defaulting to Py 3.10
+            "files": [
+                {
+                    "content": req.code
+                }
+            ]
+        }
+        
+        response = requests.post(piston_url, json=payload)
+        result = response.json()
+        
+        output = result.get('run', {}).get('output', '')
+        error = result.get('run', {}).get('stderr', '')
+        
+        return {
+            "output": output,
+            "error": error,
+            "exit_code": result.get('run', {}).get('code', 0)
+        }
+    except Exception as e:
+        logger.error(f"Piston Error: {e}")
+        return {"output": "", "error": str(e), "exit_code": 1}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

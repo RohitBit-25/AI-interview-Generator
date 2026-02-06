@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import axios from "axios"
-import { BarChart, Trophy, Target, ArrowLeft, Zap, Crown, Terminal, Activity } from "lucide-react"
+import { BarChart, Trophy, Target, ArrowLeft, Zap, Crown, Terminal, Activity, FileDown } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import {
@@ -38,6 +38,24 @@ export default function DashboardPage() {
         }
         fetchStats()
     }, [])
+
+    const handleDownloadReport = async () => {
+        try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+            const response = await axios.get(`${apiUrl}/api/report/pdf`, { responseType: 'blob' })
+
+            // Create Blob Link
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'Kaushal_AI_Report.pdf');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (e) {
+            console.error("Download failed:", e)
+        }
+    }
 
     const averageScore = stats.length > 0
         ? (stats.reduce((acc, curr) => acc + (curr.rating || 0), 0) / stats.length).toFixed(1)
@@ -76,11 +94,10 @@ export default function DashboardPage() {
                             <Zap className="w-4 h-4 fill-[#ffe600]" />
                             <span>STREAK: 3_DAYS</span>
                         </div>
-                        <Link href="/">
-                            <Button className="bg-cyan-950 text-cyan-400 border border-cyan-500 hover:bg-cyan-900 font-orbitron tracking-wide rounded-none h-10 px-6">
-                                <ArrowLeft className="mr-2 h-4 w-4" /> NEW_SESSION
-                            </Button>
                         </Link>
+                        <Button onClick={handleDownloadReport} className="bg-cyan-950/50 text-cyan-400 border border-cyan-500/50 hover:bg-cyan-900 font-orbitron tracking-wide rounded-none h-10 px-4">
+                            <FileDown className="mr-2 h-4 w-4" /> REPORT
+                        </Button>
                     </div>
                 </header>
 
@@ -242,7 +259,7 @@ export default function DashboardPage() {
                         </div>
                     )}
                 </div>
-            </div>
-        </main>
+            </div >
+        </main >
     )
 }
