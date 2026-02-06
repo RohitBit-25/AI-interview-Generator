@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import axios from "axios"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2, Play, ArrowLeft, Code2 } from "lucide-react"
+import { Loader2, Play, ArrowLeft, Code2, Terminal } from "lucide-react"
 
 export default function ArenaPage() {
     const router = useRouter()
@@ -43,8 +43,30 @@ export default function ArenaPage() {
         fetchProblem()
     }, [router])
 
+    const handleRun = async () => {
+        setIsRunning(true)
+        setReview(null)
+        try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+            const response = await axios.post(`${apiUrl}/api/arena/run`, {
+                code: code,
+                language: "python"
+            })
+            if (response.data.error) {
+                setOutput(`Error:\n${response.data.error}`)
+            } else {
+                setOutput(response.data.output || "No output returned.")
+            }
+        } catch (error) {
+            console.error(error)
+            setOutput("Execution failed due to network error.")
+        }
+        setIsRunning(false)
+    }
+
     const handleSubmit = async () => {
         setSubmitting(true)
+        setOutput("")
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
             const response = await axios.post(`${apiUrl}/api/arena/submit`, {
@@ -150,8 +172,16 @@ export default function ArenaPage() {
                                 </Button>
                             </div>
                         </div>
-                        <div className="flex-1 p-4 font-mono text-xs overflow-y-auto">
-                            {submitting ? (
+                        <div className="flex-1 p-4 font-mono text-xs overflow-y-auto whitespace-pre-wrap">
+                            {isRunning ? (
+                                <div className="text-cyan-400 animate-pulse">>> INITIATING_RUNTIME_ENVIRONMENT...</div>
+                            ) : output ? (
+                                <div className="text-slate-300">
+                                    <span className="text-green-500">$ python main.py</span>
+                                    <br />
+                                    {output}
+                                </div>
+                            ) : submitting ? (
                                 <div className="text-[#ffe600] animate-pulse">Running diagnostics...</div>
                             ) : review ? (
                                 <div className={review.is_correct ? "text-green-400" : "text-red-400"}>
@@ -163,10 +193,14 @@ export default function ArenaPage() {
                                 <span className="text-slate-600">{"> System Ready."}</span>
                             )}
                         </div>
-                        <div className="p-4 border-t border-white/5 bg-[#050a14] flex justify-end">
-                            <Button onClick={handleSubmit} disabled={submitting} className="bg-cyan-600 hover:bg-cyan-500 text-black px-8 rounded-none font-bold uppercase tracking-wider h-12 shadow-[0_0_15px_rgba(8,145,178,0.3)]">
+                        <div className="p-4 border-t border-white/5 bg-[#050a14] flex justify-end gap-3">
+                            <Button onClick={handleRun} disabled={isRunning || submitting} className="bg-slate-800 hover:bg-slate-700 text-white px-6 rounded-none font-bold uppercase tracking-wider h-12 border border-slate-600">
+                                {isRunning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Terminal className="mr-2 h-4 w-4" />}
+                                RUN_CODE
+                            </Button>
+                            <Button onClick={handleSubmit} disabled={submitting || isRunning} className="bg-cyan-600 hover:bg-cyan-500 text-black px-8 rounded-none font-bold uppercase tracking-wider h-12 shadow-[0_0_15px_rgba(8,145,178,0.3)]">
                                 {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
-                                EXECUTE
+                                SUBMIT
                             </Button>
                         </div>
                     </div>
