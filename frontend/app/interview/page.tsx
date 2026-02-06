@@ -133,6 +133,13 @@ export default function InterviewPage() {
     }
 
     const handleNext = () => {
+        // Enforce 10 question limit
+        if (history.length >= 10) {
+            alert("Mission Complete! Redirecting to Debrief...")
+            router.push("/dashboard")
+            return
+        }
+
         if (feedback?.next_question) {
             setCurrentQuestion(feedback.next_question)
             setUserAnswer("")
@@ -206,7 +213,9 @@ export default function InterviewPage() {
     if (!currentQuestion) return null
 
     return (
-        <div className={`min-h-screen transition-all duration-1000 ${cinemaMode ? 'bg-slate-950' : 'bg-slate-50'} flex flex-col items-center p-4 md:p-8 relative`}>
+        <div className={`min-h-screen transition-all duration-1000 bg-[#050a14] relative overflow-hidden flex flex-col items-center p-4 md:p-8`}>
+            {/* Cyber Background */}
+            <div className="absolute inset-0 bg-cyber-grid z-0 opacity-20 pointer-events-none" />
 
             {/* Cinema Mode Toggle */}
             <div className="absolute top-4 right-4 z-50">
@@ -214,7 +223,7 @@ export default function InterviewPage() {
                     variant="ghost"
                     size="icon"
                     onClick={() => setCinemaMode(!cinemaMode)}
-                    className={`transition-colors ${cinemaMode ? "text-slate-400 hover:text-white hover:bg-slate-800" : "text-slate-500"}`}
+                    className={`transition-colors text-cyan-500 hover:text-cyan-400 hover:bg-cyan-950/30`}
                 >
                     {cinemaMode ? <Maximize2 className="w-5 h-5" /> : <Monitor className="w-5 h-5" />}
                 </Button>
@@ -229,19 +238,19 @@ export default function InterviewPage() {
                         exit={{ opacity: 0, scale: 1.05 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <Card className={`overflow-hidden border-0 shadow-2xl transition-all duration-500 ${cinemaMode ? 'bg-slate-900/50 backdrop-blur-xl text-slate-100' : 'bg-white/80 backdrop-blur-lg'}`}>
-                            <div className={`h-2 ${cinemaMode ? 'bg-indigo-500/50' : 'bg-indigo-600'}`} />
+                        <Card className={`overflow-hidden border neon-border shadow-[0_0_50px_rgba(0,243,255,0.1)] transition-all duration-500 bg-[#0a0f1e]/90 backdrop-blur-xl`}>
+                            <div className={`h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-[#ff0099]`} />
                             <CardHeader className="md:px-8 md:pt-8 pb-4">
                                 <div className="flex items-center justify-between mb-4">
-                                    <span className={`text-xs font-bold uppercase tracking-widest ${cinemaMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
-                                        Question {history.length + 1}
+                                    <span className={`text-xs font-bold uppercase tracking-widest text-cyan-500 font-mono`}>
+                                        /// QUESTION_SEQUENCE_0{history.length + 1}
                                     </span>
                                     <div className="flex items-center gap-4">
-                                        {evaluating && <span className="text-xs text-amber-500 animate-pulse font-mono">Thinking...</span>}
-                                        <span className={`text-xs font-bold ${cinemaMode ? 'text-slate-500' : 'text-slate-400'}`}>Score: {score}</span>
+                                        {evaluating && <span className="text-xs text-[#ffe600] animate-pulse font-mono">PROCESSING_RESPONSE...</span>}
+                                        <span className={`text-xs font-bold text-slate-400 font-mono`}>SCORE: {score}</span>
                                     </div>
                                 </div>
-                                <h2 className={`text-2xl md:text-3xl font-bold leading-tight ${cinemaMode ? 'text-slate-100' : 'text-slate-900'}`}>
+                                <h2 className={`text-2xl md:text-3xl font-bold leading-tight text-white font-orbitron tracking-wide`}>
                                     {currentQuestion.question}
                                 </h2>
                             </CardHeader>
@@ -264,7 +273,7 @@ export default function InterviewPage() {
                                                     delay: i * 0.05
                                                 }
                                             }}
-                                            className={`w-1.5 rounded-full transition-colors duration-300 ${isListening ? 'bg-indigo-500' : (cinemaMode ? 'bg-slate-700' : 'bg-slate-200')}`}
+                                            className={`w-1.5 rounded-none transition-colors duration-300 ${isListening ? 'bg-[#ff0099] shadow-[0_0_10px_#ff0099]' : 'bg-cyan-900/50'}`}
                                         />
                                     ))}
                                 </div>
@@ -273,29 +282,25 @@ export default function InterviewPage() {
                                     <motion.div
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        className={`rounded-xl p-6 backdrop-blur-md border ${feedback.rating >= 7
-                                            ? (cinemaMode ? 'bg-green-900/20 border-green-800' : 'bg-green-50 border-green-200')
-                                            : (cinemaMode ? 'bg-amber-900/20 border-amber-800' : 'bg-amber-50 border-amber-200')
+                                        className={`rounded-none p-6 backdrop-blur-md border ${feedback.rating >= 7
+                                            ? 'bg-green-950/30 border-green-500/50'
+                                            : 'bg-red-950/30 border-red-500/50'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3 mb-2">
                                             {feedback.rating >= 7
-                                                ? <CheckCircle2 className={`w-5 h-5 ${cinemaMode ? 'text-green-400' : 'text-green-600'}`} />
-                                                : <AlertTriangle className={`w-5 h-5 ${cinemaMode ? 'text-amber-400' : 'text-amber-600'}`} />
+                                                ? <CheckCircle2 className={`w-5 h-5 text-green-400`} />
+                                                : <AlertTriangle className={`w-5 h-5 text-red-400`} />
                                             }
-                                            <span className={`font-bold ${cinemaMode ? 'text-slate-200' : 'text-slate-800'}`}>Analysis (Score: {feedback.rating}/10)</span>
+                                            <span className={`font-bold font-mono ${feedback.rating >= 7 ? 'text-green-400' : 'text-red-400'}`}>ANALYSIS_RESULT (SCORE: {feedback.rating}/10)</span>
                                         </div>
-                                        <p className={`text-sm leading-relaxed ${cinemaMode ? 'text-slate-300' : 'text-slate-600'}`}>{feedback.feedback}</p>
+                                        <p className={`text-sm leading-relaxed text-slate-300 font-mono`}>{feedback.feedback}</p>
                                     </motion.div>
                                 ) : (
                                     <div className="relative group">
                                         <textarea
-                                            className={`w-full rounded-xl border-0 p-4 text-lg shadow-inner ring-1 transition-all focus:ring-2 disabled:opacity-50
-                                                ${cinemaMode
-                                                    ? 'bg-slate-800/50 ring-slate-700 text-slate-100 placeholder:text-slate-600 focus:bg-slate-800 focus:ring-indigo-500/50'
-                                                    : 'bg-slate-50 ring-slate-200 text-slate-900 focus:bg-white focus:ring-indigo-500/20'
-                                                }`}
-                                            placeholder="Type your answer or speak..."
+                                            className={`w-full rounded-none border border-cyan-900/50 p-4 text-lg shadow-inner transition-all focus:ring-0 focus:border-cyan-500 disabled:opacity-50 bg-[#050a14] text-cyan-50 placeholder:text-cyan-900/50 font-mono`}
+                                            placeholder=">> INPUT_RESPONSE..."
                                             rows={4}
                                             value={userAnswer}
                                             onChange={(e) => setUserAnswer(e.target.value)}
@@ -311,9 +316,9 @@ export default function InterviewPage() {
                                         size="icon"
                                         onClick={toggleRecording}
                                         disabled={evaluating || !!feedback}
-                                        className={`rounded-full h-12 w-12 border-0 shadow-lg transition-all hover:scale-105 active:scale-95 ${isListening
-                                            ? "bg-red-500 hover:bg-red-600 text-white animate-pulse shadow-red-500/30"
-                                            : (cinemaMode ? "bg-slate-800 hover:bg-slate-700 text-slate-300" : "bg-white hover:bg-slate-50")
+                                        className={`rounded-none h-12 w-12 border-2 transition-all ${isListening
+                                            ? "bg-red-600 border-red-500 text-white animate-pulse"
+                                            : "bg-slate-900 border-cyan-900 text-cyan-400 hover:border-cyan-500 hover:text-cyan-300"
                                             }`}
                                     >
                                         {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
@@ -323,7 +328,7 @@ export default function InterviewPage() {
                                         size="icon"
                                         onClick={() => playAudio(currentQuestion.question)}
                                         disabled={isSpeaking || evaluating}
-                                        className={`rounded-full h-12 w-12 border-0 shadow-lg transition-all hover:scale-105 active:scale-95 ${cinemaMode ? "bg-slate-800 hover:bg-slate-700 text-slate-300" : "bg-white hover:bg-slate-50"
+                                        className={`rounded-none h-12 w-12 border-2 transition-all bg-slate-900 border-cyan-900 text-cyan-400 hover:border-cyan-500 hover:text-cyan-300
                                             }`}
                                     >
                                         {isSpeaking ? <Loader2 className="h-5 w-5 animate-spin" /> : <Volume2 className="h-5 w-5" />}
@@ -331,24 +336,24 @@ export default function InterviewPage() {
                                 </div>
                                 <div className="flex-1 flex gap-3">
                                     {feedback ? (
-                                        <Button onClick={handleNext} className="w-full h-12 rounded-full text-lg shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30">
-                                            Next Question <ArrowRight className="ml-2 h-5 w-5" />
+                                        <Button onClick={handleNext} className="w-full h-12 rounded-none text-lg bg-cyan-600 hover:bg-cyan-500 text-black font-bold uppercase tracking-wider">
+                                            {history.length >= 10 ? "Finish Interview" : "Next Mission"} <ArrowRight className="ml-2 h-5 w-5" />
                                         </Button>
                                     ) : (
                                         <>
                                             <Button
-                                                variant="ghost"
+                                                variant="outline"
                                                 onClick={() => handleSubmit(true)}
-                                                className={`h-12 rounded-full px-6 ${cinemaMode ? "text-slate-400 hover:text-white hover:bg-slate-800" : "text-slate-500"}`}
+                                                className={`h-12 rounded-none px-6 border-cyan-900 text-cyan-500 hover:bg-cyan-950/50 hover:text-cyan-400 font-mono`}
                                             >
-                                                Skip
+                                                SKIP_SEQUENCE
                                             </Button>
                                             <Button
                                                 onClick={() => handleSubmit(false)}
                                                 disabled={(!userAnswer && !isListening) || evaluating}
-                                                className="flex-1 h-12 rounded-full text-lg shadow-lg hover:translate-y-[-2px] transition-all"
+                                                className="flex-1 h-12 rounded-none text-lg bg-[#ffe600] text-black hover:bg-[#e6cf00] font-bold uppercase tracking-wider relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
-                                                Submit Answer
+                                                {evaluating ? "ANALYZING..." : "DEPLOY ANSWER"}
                                             </Button>
                                         </>
                                     )}

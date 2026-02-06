@@ -214,13 +214,13 @@ export default function Home() {
                       exit={{ opacity: 0 }}
                       className="py-10"
                     >
-                      <div className="mx-auto w-24 h-24 bg-slate-900 border border-slate-700 hover:border-cyan-500/50 flex items-center justify-center mb-6 text-slate-500 hover:text-cyan-400 shadow-xl transition-all group-hover:scale-110 duration-300 rounded-none transform rotate-45 group-hover:rotate-0">
+                      <div className="mx-auto w-24 h-24 bg-slate-900 border border-slate-700 hover:border-cyan-500/50 flex items-center justify-center mb-6 text-slate-400 hover:text-cyan-400 shadow-xl transition-all group-hover:scale-110 duration-300 rounded-none transform rotate-45 group-hover:rotate-0">
                         <div className="transform -rotate-45 group-hover:rotate-0 transition-transform duration-300">
                           <Upload className="w-10 h-10" />
                         </div>
                       </div>
                       <h3 className="text-2xl font-bold text-white mb-2 uppercase tracking-tight">Upload Resume Profile</h3>
-                      <p className="text-slate-500 mb-8 font-mono text-sm">Target Formats: PDF, TXT (Max 5MB)</p>
+                      <p className="text-cyan-500/80 mb-8 font-mono text-sm max-w-xs mx-auto">Target Formats: PDF, TXT (Max 5MB)</p>
                       <Button
                         onClick={() => document.getElementById("resume-upload")?.click()}
                         variant="outline"
