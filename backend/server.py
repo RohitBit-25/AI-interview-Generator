@@ -171,9 +171,23 @@ async def next_question(req: InterviewNextRequest):
     try:
         evaluation = {}
         if not req.skipped and API_KEY:
-            evaluation = llm.evaluate_answer(req.history[-1]['question'] if req.history else "Intro", req.last_answer)
+            # Evaluate current answer
+            current_q_text = req.history[-1]['question'] if req.history else "Intro"
+            evaluation = llm.evaluate_answer(current_q_text, req.last_answer)
+            
+            # Save to DB
+            db.save_interaction(
+                session_id=SESSION_ID,
+                role="Software Engineer",
+                difficulty="Medium",
+                question=current_q_text,
+                answer=req.last_answer,
+                feedback=evaluation.get("feedback", ""),
+                rating=evaluation.get("rating", 0),
+                q_type="Interview"
+            )
         
-        # Generate next question logic
+        # Generate NEXT question
         # For simplicity, we ask LLM for the NEXT question based on history
         # Or we could have generated a list at start. 
         # Let's simple-gen a new one dynamics
@@ -184,9 +198,9 @@ async def next_question(req: InterviewNextRequest):
              questions = llm.generate_questions(req.resume_text, "Candidate", "Medium")
              # Pick a random new one or next in list logic
              import random
-             next_q = random.choice(questions)
+             next_q = random.choice(questions) if questions else None
         else:
-             next_q = {"question": "What is your greatest strength?", "type": "Behavioral", "topic": "General"}
+             raise HTTPException(status_code=400, detail="API_KEY required")
 
         return {
             "evaluation": evaluation,
@@ -248,8 +262,19 @@ async def get_arena_problem(req: ArenaProblemRequest):
 async def submit_arena(req: ArenaSubmitRequest):
     if API_KEY:
         review = llm.review_code(req.problem, req.code)
+        # Save attempt to DB
+        db.save_interaction(
+            session_id=SESSION_ID,
+            role="Dev",
+            difficulty="Hard",
+            question=req.problem,
+            answer=req.code,
+            feedback=review.get("feedback", ""),
+            rating=review.get("rating", 0),
+            q_type="Arena"
+        )
         return review
-    return {"feedback": "No API Key", "rating": 0, "is_correct": False}
+    raise HTTPException(status_code=400, detail="API_KEY required")
 
 if __name__ == "__main__":
     import uvicorn
