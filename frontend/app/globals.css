@@ -4,47 +4,50 @@
 
 @layer base {
   :root {
-    /* Base - Warm Cream (Indian Paper) - Slightly warmer */
-    --background: 36 30% 98%;
-    --foreground: 224 71% 8%;
+    /* Base - Deep Space */
+    --background: 240 30% 6%;
+    /* #0b0c14 */
+    --foreground: 210 40% 98%;
 
-    /* Card - White Texture */
-    --card: 0 0% 100%;
-    --card-foreground: 224 71% 8%;
+    /* Card - Cyber Black */
+    --card: 240 25% 10%;
+    --card-foreground: 210 40% 98%;
 
     /* Popover */
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 8%;
+    --popover: 240 25% 10%;
+    --popover-foreground: 210 40% 98%;
 
-    /* Primary - Deep Saffron (Kesariya) - More vibrant/saturated */
-    --primary: 24 95% 53%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary - Neon Cyan */
+    --primary: 180 100% 50%;
+    /* #00f3ff */
+    --primary-foreground: 240 30% 6%;
 
-    /* Secondary - Royal Peacock Teal (Mayur) */
-    --secondary: 178 85% 28%;
-    --secondary-foreground: 210 40% 98%;
+    /* Secondary - Cyber Yellow */
+    --secondary: 56 100% 50%;
+    /* #ffe600 */
+    --secondary-foreground: 240 30% 6%;
 
     /* Muted */
-    --muted: 36 30% 94%;
-    --muted-foreground: 24 15% 45%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
 
-    /* Accent - Marigold (Genda) */
-    --accent: 42 90% 60%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent - Hot Pink */
+    --accent: 320 100% 60%;
+    /* #ff0099 */
+    --accent-foreground: 210 40% 98%;
 
     /* Destructive */
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 100% 60%;
     --destructive-foreground: 210 40% 98%;
 
     /* Border & Input */
-    --border: 36 20% 85%;
-    --input: 36 20% 85%;
-    --ring: 24 95% 53%;
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 180 100% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.25rem;
+    /* Sharp corners for cyber feel */
   }
-
-  /* ... Dark mode omitted for brevity/focus on light theme enhancement first ... */
 }
 
 @layer base {
@@ -54,72 +57,123 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-outfit), sans-serif;
   }
 
+  /* Custom Utilities */
+  /* Custom Utilities */
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    font-family: var(--font-eczar), serif;
-    letter-spacing: -0.01em;
+    font-family: var(--font-orbitron), sans-serif;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
 }
 
 @layer utilities {
-  .bg-jaali {
-    background-color: transparent;
-    opacity: 0.03;
-    background-image: radial-gradient(#14b8a6 1.5px, transparent 1.5px), radial-gradient(#14b8a6 1.5px, transparent 1.5px);
-    background-size: 24px 24px;
-    background-position: 0 0, 12px 12px;
-  }
-
-  .text-saffron-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-orange-600 via-red-600 to-rose-600;
-  }
-}
-
-/* Custom Utilities */
-@layer utilities {
-  /* ... existing utilities ... */
-}
-
-/* Custom Utilities */
-@layer utilities {
-  .bg-mandala {
+  .bg-cyber-grid {
+    background-size: 40px 40px;
     background-image:
-      radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.05) 0%, transparent 50%),
-      repeating-radial-gradient(circle at 100% 100%, rgba(20, 184, 166, 0.05) 0, rgba(20, 184, 166, 0.05) 20px, transparent 20px, transparent 40px);
-    background-size: 100% 100%;
+      linear-gradient(to right, rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+    mask-image: radial-gradient(circle at center, black 60%, transparent 100%);
   }
 
-  .glass {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 166, 0, 0.2);
-    /* Saffron tint */
-    box-shadow: 0 8px 32px 0 rgba(249, 115, 22, 0.1);
+  /* Glitch Effect */
+  .glitch {
+    position: relative;
   }
 
-  @keyframes float {
+  .glitch::before,
+  .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0b0c14;
+  }
+
+  .glitch::before {
+    left: 2px;
+    text-shadow: -1px 0 #ff0099;
+    clip: rect(24px, 550px, 90px, 0);
+    animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+  }
+
+  .glitch::after {
+    left: -2px;
+    text-shadow: -1px 0 #00f3ff;
+    clip: rect(85px, 550px, 140px, 0);
+    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+  }
+
+  @keyframes glitch-anim-1 {
     0% {
-      transform: translateY(0px);
+      clip: rect(20px, 9999px, 80px, 0);
     }
 
-    50% {
-      transform: translateY(-10px);
+    20% {
+      clip: rect(10px, 9999px, 120px, 0);
+    }
+
+    40% {
+      clip: rect(50px, 9999px, 90px, 0);
+    }
+
+    60% {
+      clip: rect(80px, 9999px, 40px, 0);
+    }
+
+    80% {
+      clip: rect(30px, 9999px, 140px, 0);
     }
 
     100% {
-      transform: translateY(0px);
+      clip: rect(60px, 9999px, 20px, 0);
     }
   }
 
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
+  @keyframes glitch-anim-2 {
+    0% {
+      clip: rect(5px, 9999px, 100px, 0);
+    }
+
+    20% {
+      clip: rect(90px, 9999px, 30px, 0);
+    }
+
+    40% {
+      clip: rect(30px, 9999px, 10px, 0);
+    }
+
+    60% {
+      clip: rect(60px, 9999px, 50px, 0);
+    }
+
+    80% {
+      clip: rect(10px, 9999px, 140px, 0);
+    }
+
+    100% {
+      clip: rect(40px, 9999px, 80px, 0);
+    }
+  }
+
+  .neon-border {
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3), inset 0 0 5px rgba(0, 243, 255, 0.1);
+    border: 1px solid rgba(0, 243, 255, 0.5);
+  }
+
+  .neon-text-glow {
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+  }
+
+  .neon-pink-glow {
+    box-shadow: 0 0 15px rgba(255, 0, 153, 0.4);
   }
 }

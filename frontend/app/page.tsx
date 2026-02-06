@@ -114,148 +114,160 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 px-6 md:px-12 lg:px-24 overflow-hidden">
-        {/* Background Texture & Mandala */}
-        <div className="absolute inset-0 bg-texture opacity-40 z-0" />
-        <div className="absolute inset-0 bg-jaali z-0" />
+      <section className="relative min-h-screen flex flex-col justify-center pt-24 px-6 md:px-12 lg:px-24 overflow-hidden border-b border-white/10">
+        {/* Cyber Grid Background */}
+        <div className="absolute inset-0 bg-[#050a14] z-0" />
+        <div className="absolute inset-0 bg-cyber-grid z-0 opacity-40" />
 
-        {/* Rotating Mandala - Large Background Element */}
-        <div className="absolute -top-[20%] -right-[15%] w-[800px] h-[800px] opacity-[0.08] animate-[spin_60s_linear_infinite] pointer-events-none z-0">
-          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path fill="#f97316" d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,81.6,-46.6C91.4,-34.1,98.1,-19.2,95.8,-4.9C93.5,9.3,82.1,23,71.2,34.8C60.3,46.6,49.9,56.5,38.1,64.4C26.3,72.3,13.1,78.2,-0.5,79.1C-14.1,80,-28.3,75.9,-40.5,68.2C-52.8,60.5,-63.1,49.2,-71.3,36.5C-79.5,23.8,-85.6,9.7,-84.9,-4.1C-84.2,-17.8,-76.7,-31.2,-66.9,-42.6C-57.2,-54,-45.2,-63.4,-32.4,-71.6C-19.6,-79.8,-6,-86.8,6.8,-98.6L44.7,-76.4Z" transform="translate(100 100)" />
-          </svg>
-        </div>
-        <div className="absolute -bottom-[20%] -left-[15%] w-[600px] h-[600px] opacity-[0.06] animate-[spin_80s_linear_infinite_reverse] pointer-events-none z-0">
-          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path fill="#14b8a6" d="M42.7,-72.8C54.8,-66.3,63.6,-53,70.9,-39.7C78.2,-26.4,84.1,-13.2,82.3,-1C80.5,11.2,71.1,22.4,62.1,33.3C53.1,44.2,44.5,54.8,33.9,62.1C23.3,69.4,10.7,73.4,-0.8,74.8C-12.3,76.2,-24.6,75,-36.4,68.7C-48.2,62.4,-59.5,51,-67.2,38.2C-74.9,25.4,-79.1,11.2,-75.8,-1.9C-72.5,-15,-61.8,-27,-51.7,-37.9C-41.6,-48.8,-32.2,-58.6,-21.2,-65.8C-10.2,-73,2.4,-77.6,15.7,-83.4L42.7,-72.8Z" transform="translate(100 100)" />
-          </svg>
-        </div>
+        {/* Glow Spheres */}
+        <div className="absolute top-[10%] left-[20%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[100px] mix-blend-screen pointer-events-none" />
+        <div className="absolute bottom-[10%] right-[10%] w-[600px] h-[600px] bg-[#ff0099]/10 rounded-full blur-[120px] mix-blend-screen pointer-events-none" />
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center max-w-4xl mx-auto mb-16 relative z-10"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-5xl mx-auto mb-16 relative z-10"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-orange-200 shadow-sm mb-8 hover:shadow-md transition-shadow">
-            <span className="flex h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
-            <span className="text-sm font-semibold tracking-wide text-orange-800 uppercase" style={{ fontFamily: 'var(--font-outfit)' }}>India's #1 Career Copilot</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-none border border-cyan-500/30 bg-cyan-950/20 backdrop-blur-sm mb-8">
+            <span className="w-2 h-2 bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
+            <span className="text-sm font-bold tracking-widest text-cyan-400 uppercase">System Online | v2.0 Arena</span>
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-8 leading-[1.0] text-slate-900" style={{ fontFamily: 'var(--font-eczar)' }}>
-            Design Your <span className="italic text-teal-700">Karma.</span><br />
-            <span className="text-saffron-gradient">Stitch Your Future.</span>
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-[0.9] text-white uppercase relative">
+            <span className="block mb-2 glitch" data-text="Enter The">Enter The</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-[#ff0099] neon-text-glow">Coding Arena</span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
-            Like a tailored masterpiece, <strong className="text-orange-700 font-medium">Kaushal.ai</strong> weaves your skills into a narrative that recruiters can't ignore.
+          <p className="text-xl md:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto font-light tracking-wide">
+            Upgrade your career stack. <strong className="text-cyan-400">Kaushal.ai</strong> is the ultimate battleground to prep for your next tech interview.
           </p>
         </motion.div>
 
-        {/* Upload Puck - Central Interaction */}
+        {/* Upload Interface - Cyberpunk Style */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="relative z-20 max-w-xl mx-auto"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="relative z-20 max-w-2xl mx-auto w-full"
         >
-          {/* Decorative Stitch Border Container */}
-          <div className={`p-5 rounded-2xl bg-white/90 backdrop-blur-sm shadow-2xl transition-all duration-300 stitch-border ${isDragging ? "ring-4 ring-orange-200 scale-[1.02]" : ""}`}>
-            <div
-              onDragOver={onDragOver}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-              className="bg-orange-50/30 rounded-lg border-2 border-dashed border-orange-200/50 p-10 text-center hover:bg-orange-50/60 transition-colors cursor-pointer relative overflow-hidden"
-            >
-              <AnimatePresence mode="wait">
-                {file ? (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="py-4"
-                  >
-                    <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-600">
-                      <CheckCircle className="w-8 h-8" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-slate-900">{file.name}</h3>
-                    <p className="text-sm text-slate-500 mb-6">{uploadSuccess ? "Analysis Complete" : "Ready to analyze"}</p>
+          {/* Neon Border Container */}
+          <div className={`relative p-[1px] bg-gradient-to-r from-cyan-500 via-purple-500 to-[#ff0099] ${isDragging ? "animate-pulse" : ""}`}>
+            <div className={`bg-[#0a0f1e] p-10 text-center relative overflow-hidden transition-all duration-300 group`}>
 
-                    {loading ? (
-                      <div className="space-y-3">
-                        <div className="h-2 w-full bg-orange-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-orange-500 animate-shine w-full rounded-full origin-left" style={{ transform: `scaleX(${progress / 100})`, transition: 'transform 0.2s' }}></div>
-                        </div>
-                        <p className="text-xs text-orange-600 font-mono tracking-widest">WEAVING DATA...</p>
-                      </div>
-                    ) : uploadSuccess ? (
-                      <div className="space-y-4">
-                        <div className="bg-white border border-orange-200 p-4 rounded-lg shadow-sm">
-                          <p className="text-xs text-orange-500 uppercase font-bold tracking-wider mb-1">Detected Role</p>
-                          <p className="text-lg font-bold text-slate-900">
-                            {JSON.parse(localStorage.getItem("resumeData") || "{}").detected_role || "Software Engineer"}
-                          </p>
-                        </div>
-                        <Button onClick={() => router.push("/interview")} size="lg" className="w-full h-12 text-lg rounded-xl shadow-lg bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white">
-                          Start Interview <ArrowRight className="ml-2 w-5 h-5" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <Button onClick={handleUpload} size="lg" className="w-full h-12 text-lg rounded-xl shadow-lg bg-slate-900 text-white hover:bg-slate-800">
-                        Analyze Resume <ArrowRight className="ml-2 w-5 h-5" />
-                      </Button>
-                    )}
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="py-8"
-                  >
-                    <div className="mx-auto w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 text-orange-500 shadow-md group-hover:scale-110 transition-transform">
-                      <Upload className="w-8 h-8" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Drop your resume here</h3>
-                    <p className="text-slate-500 mb-8">PDF or TXT (Max 5MB)</p>
-                    <Button
-                      onClick={() => document.getElementById("resume-upload")?.click()}
-                      variant="outline"
-                      className="rounded-full px-8 border-orange-200 text-orange-700 hover:bg-orange-50"
+              {/* Scanlines Overlay */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-0 pointer-events-none bg-[length:100%_4px,3px_100%]" />
+
+              <div
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
+                onDrop={onDrop}
+                className="relative z-10 cursor-pointer"
+              >
+                <AnimatePresence mode="wait">
+                  {file ? (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="py-4"
                     >
-                      Browse Files
-                    </Button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              <input
-                id="resume-upload"
-                type="file"
-                accept=".pdf,.txt"
-                className="hidden"
-                onChange={handleFileChange}
-              />
+                      <div className="mx-auto w-20 h-20 bg-cyan-950/50 border border-cyan-500/50 flex items-center justify-center mb-6 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)] rounded-none">
+                        <CheckCircle className="w-10 h-10" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-1 font-mono">{file.name}</h3>
+                      <p className="text-sm text-cyan-500/70 mb-8 font-mono uppercase tracking-widest">{uploadSuccess ? ">> Analysis Complete" : ">> Ready to Initialize"}</p>
+
+                      {loading ? (
+                        <div className="space-y-4 max-w-sm mx-auto">
+                          <div className="h-1 w-full bg-slate-800 overflow-hidden relative">
+                            <div className="h-full bg-cyan-500 absolute top-0 left-0" style={{ width: `${progress}%`, boxShadow: '0 0 10px #06b6d4' }}></div>
+                          </div>
+                          <div className="flex justify-between text-xs font-mono text-cyan-500">
+                            <span>PROCESSING_DATA</span>
+                            <span>{progress}%</span>
+                          </div>
+                        </div>
+                      ) : uploadSuccess ? (
+                        <div className="space-y-4">
+                          <div className="bg-cyan-950/30 border border-cyan-500/30 p-4 mb-4">
+                            <p className="text-xs text-cyan-400 uppercase font-bold tracking-widest mb-1">DETECTED_CLASS</p>
+                            <p className="text-xl font-bold text-white font-mono">
+                              {JSON.parse(localStorage.getItem("resumeData") || "{}").detected_role || "SOFTWARE_ENGINEER"}
+                            </p>
+                          </div>
+                          <Button onClick={() => router.push("/interview")} size="lg" className="w-full h-14 text-lg rounded-none bg-cyan-600 hover:bg-cyan-500 text-black font-bold uppercase tracking-wider relative overflow-hidden group/btn">
+                            <span className="relative z-10 flex items-center justify-center">Enter Simulation <ArrowRight className="ml-2 w-5 h-5" /></span>
+                            <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button onClick={handleUpload} size="lg" className="w-full h-14 text-lg rounded-none bg-white text-black hover:bg-cyan-400 hover:text-black font-bold uppercase tracking-wider transition-all">
+                          Initialize Analysis <ArrowRight className="ml-2 w-5 h-5" />
+                        </Button>
+                      )}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="py-10"
+                    >
+                      <div className="mx-auto w-24 h-24 bg-slate-900 border border-slate-700 hover:border-cyan-500/50 flex items-center justify-center mb-6 text-slate-500 hover:text-cyan-400 shadow-xl transition-all group-hover:scale-110 duration-300 rounded-none transform rotate-45 group-hover:rotate-0">
+                        <div className="transform -rotate-45 group-hover:rotate-0 transition-transform duration-300">
+                          <Upload className="w-10 h-10" />
+                        </div>
+                      </div>
+                      <h3 className="text-2xl font-bold text-white mb-2 uppercase tracking-tight">Upload Resume Profile</h3>
+                      <p className="text-slate-500 mb-8 font-mono text-sm">Target Formats: PDF, TXT (Max 5MB)</p>
+                      <Button
+                        onClick={() => document.getElementById("resume-upload")?.click()}
+                        variant="outline"
+                        className="rounded-none px-10 py-6 border-cyan-500/30 text-cyan-400 hover:bg-cyan-950/50 hover:text-cyan-300 hover:border-cyan-400 transition-all font-mono uppercase tracking-widest text-xs"
+                      >
+                        [ Select Data File ]
+                      </Button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <input
+                  id="resume-upload"
+                  type="file"
+                  accept=".pdf,.txt"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </div>
             </div>
+            {/* Corner Accents */}
+            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-cyan-500 -mt-px -ml-px" />
+            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#ff0099] -mt-px -mr-px" />
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#ff0099] -mb-px -ml-px" />
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-cyan-500 -mb-px -mr-px" />
           </div>
+
           {/* Error Toast */}
           {error && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="absolute -bottom-16 left-0 right-0 bg-red-50 text-red-600 text-sm py-3 px-4 rounded-lg text-center border border-red-100"
+              className="mt-4 bg-red-900/20 text-red-400 text-sm py-3 px-4 rounded-none border-l-4 border-red-500 font-mono"
             >
-              {error}
+              !! SYSTEM ERROR: {error}
             </motion.div>
           )}
         </motion.div>
       </section>
 
-      {/* Bento Grid Features */}
-      <section className="py-24 px-6 md:px-12 lg:px-24 bg-white border-t border-slate-100">
+      {/* Bento Grid Features - Cyberpunk Arena */}
+      <section className="py-24 px-6 md:px-12 lg:px-24 bg-[#050a14] border-t border-white/5 relative">
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+
         <div className="max-w-7xl mx-auto">
           <div className="mb-16 text-center">
-            <h2 className="text-3xl font-bold tracking-tight mb-4">Everything needed to ace the technical round</h2>
-            <p className="text-slate-500">Comprehensive preparation tools in one platform.</p>
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4 text-white uppercase neon-text-glow">Loadout Initialization</h2>
+            <p className="text-cyan-400 font-mono tracking-widest text-sm">/// SELECT_TRAINING_MODULE</p>
           </div>
 
           <motion.div
@@ -266,65 +278,67 @@ export default function Home() {
             className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]"
           >
             {/* Large Card - Interview */}
-            <motion.div variants={item} className="md:col-span-2 group relative overflow-hidden rounded-3xl bg-slate-50 border border-slate-100 p-8 flex flex-col justify-between hover:shadow-xl transition-all duration-500 hover:border-indigo-100/50">
+            <motion.div variants={item} className="md:col-span-2 group relative overflow-hidden bg-card border border-white/10 p-8 flex flex-col justify-between hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(0,243,255,0.15)] transition-all duration-500">
+              <div className="absolute inset-0 bg-cyber-grid opacity-20 pointer-events-none" />
               <div className="relative z-10">
-                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-4 text-indigo-600">
+                <div className="w-12 h-12 bg-cyan-950 flex items-center justify-center mb-4 text-cyan-400 border border-cyan-500/30">
                   <MessageSquare className="w-6 h-6" />
                 </div>
-                <h3 className="text-2xl font-bold mb-2">Adaptive Interview</h3>
-                <p className="text-slate-500 max-w-md">Our AI adapts to your responses, asking follow-up questions just like a real interviewer. Supports Voice and Text.</p>
+                <h3 className="text-2xl font-bold mb-2 text-white">Adaptive Combat Simulation</h3>
+                <p className="text-slate-400 max-w-md font-light">AI adversary adapts to your responses in real-time. Supports Voice and Text combat modes.</p>
               </div>
               {/* Abstract UI Mockup */}
-              <div className="absolute right-[-20px] bottom-[-20px] w-2/3 h-2/3 bg-white rounded-tl-2xl shadow-2xl border border-slate-100 p-4 transition-transform group-hover:translate-x-[-10px] group-hover:translate-y-[-10px]">
-                <div className="flex gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-full bg-indigo-100" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-2 bg-slate-100 rounded w-3/4" />
-                    <div className="h-2 bg-slate-100 rounded w-1/2" />
-                  </div>
+              <div className="absolute right-[-20px] bottom-[-20px] w-2/3 h-2/3 bg-[#0a0f1e] rounded-tl-none border border-cyan-500/20 p-4 transition-transform group-hover:translate-x-[-10px] group-hover:translate-y-[-10px]">
+                <div className="flex gap-2 mb-4 items-center">
+                  <div className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse" />
+                  <div className="h-1 bg-cyan-900 w-full" />
                 </div>
-                <div className="flex gap-2 flex-row-reverse">
-                  <div className="w-8 h-8 rounded-full bg-slate-200" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-8 bg-indigo-600 rounded-lg w-full" />
-                  </div>
+                <div className="space-y-2 font-mono text-[10px] text-cyan-700">
+                  <p>&gt; INITIATING_SEQUENCE...</p>
+                  <p>&gt; ANALYZING_RESPONSE...</p>
+                  <p className="text-cyan-400">&gt; TARGET_LOCKED</p>
                 </div>
               </div>
             </motion.div>
 
             {/* Tall Card - Coding */}
-            <motion.div variants={item} className="md:row-span-2 group relative overflow-hidden rounded-3xl bg-[#0F172A] text-white p-8 flex flex-col hover:shadow-2xl transition-all duration-500">
-              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6 text-white backdrop-blur-sm">
+            <motion.div variants={item} className="md:row-span-2 group relative overflow-hidden bg-[#0a0f1e] border border-white/10 p-8 flex flex-col hover:border-[#ffe600]/50 hover:shadow-[0_0_30px_rgba(255,230,0,0.15)] transition-all duration-500">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-[#ffe600] to-transparent opacity-50" />
+              <div className="w-12 h-12 bg-yellow-950/30 flex items-center justify-center mb-6 text-[#ffe600] border border-[#ffe600]/30 backdrop-blur-sm">
                 <Code className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-bold mb-2">Coding Arena</h3>
-              <p className="text-slate-400 mb-8">Integrated IDE with real-time complexity analysis and test execution.</p>
+              <h3 className="text-2xl font-bold mb-2 text-white">Code Arena</h3>
+              <p className="text-slate-400 mb-8 font-light">Live execution environment with complexity analysis.</p>
 
-              <div className="flex-1 bg-black/30 rounded-xl border border-white/10 p-4 font-mono text-xs text-green-400">
-                <p>def two_sum(nums, target):</p>
-                <p className="pl-4">seen = {'{}'}</p>
-                <p className="pl-4">for i, n in enumerate(nums):</p>
-                <p className="pl-8">comp = target - n</p>
-                <p className="pl-8 text-white"><span className="animate-pulse">|</span></p>
+              <div className="flex-1 bg-black/50 border border-white/10 p-4 font-mono text-xs text-green-400 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-2 text-[8px] text-[#ffe600] uppercase tracking-wider">Python 3.10</div>
+                <p className="text-pink-500">def <span className="text-yellow-400">optimize_core</span>(data):</p>
+                <p className="pl-4 text-slate-500"># Complexity: O(log n)</p>
+                <p className="pl-4">if not data: return 0</p>
+                <p className="pl-4">buffer = []</p>
+                <p className="pl-4 text-white"><span className="animate-pulse">_</span></p>
+
+                {/* Scanline */}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-green-500/10 to-transparent h-4 w-full animate-[scan_2s_linear_infinite]" />
               </div>
             </motion.div>
 
             {/* Standard Card - Resume */}
-            <motion.div variants={item} className="group relative overflow-hidden rounded-3xl bg-white border border-slate-200 p-8 hover:shadow-lg transition-all">
-              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4 text-orange-600">
+            <motion.div variants={item} className="group relative overflow-hidden bg-card border border-white/10 p-8 hover:border-[#ff0099]/50 hover:shadow-[0_0_30px_rgba(255,0,153,0.15)] transition-all">
+              <div className="w-12 h-12 bg-pink-950/30 flex items-center justify-center mb-4 text-[#ff0099] border border-[#ff0099]/30">
                 <Zap className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Instant Analysis</h3>
-              <p className="text-slate-500">Extracts skills and projects from your resume in seconds to tailor the session.</p>
+              <h3 className="text-xl font-bold mb-2 text-white">Rapid Analysis</h3>
+              <p className="text-slate-400 font-light">Extracts skill vectors from your resume in &lt;50ms.</p>
             </motion.div>
 
             {/* Standard Card - Quiz */}
-            <motion.div variants={item} className="group relative overflow-hidden rounded-3xl bg-blue-50 border border-blue-100 p-8 hover:shadow-lg transition-all">
-              <div className="w-12 h-12 bg-blue-200 rounded-xl flex items-center justify-center mb-4 text-blue-700">
+            <motion.div variants={item} className="group relative overflow-hidden bg-card border border-white/10 p-8 hover:border-blue-500/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-all">
+              <div className="w-12 h-12 bg-blue-950/30 flex items-center justify-center mb-4 text-blue-400 border border-blue-500/30">
                 <Play className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Gamified Quizzes</h3>
-              <p className="text-slate-600">Test your domain knowledge with quick-fire technical quizzes.</p>
+              <h3 className="text-xl font-bold mb-2 text-white">S.W.A.T. Drills</h3>
+              <p className="text-slate-400 font-light">Gamified technical quizzes to test your domain reflexes.</p>
             </motion.div>
 
           </motion.div>
@@ -332,8 +346,9 @@ export default function Home() {
       </section>
 
       {/* Simple Footer */}
-      <footer className="py-12 text-center text-slate-400 text-sm">
-        <p>© 2024 PrepAI. Built for engineers.</p>
+      <footer className="py-12 text-center text-slate-600 text-sm bg-[#020408] border-t border-white/5 font-mono">
+        <p className="opacity-50">SYSTEM_ID: Kaushal.ai // <span className="text-cyan-500">ONLINE</span></p>
+        <p className="mt-2 text-xs">Built for the next generation of engineers.</p>
       </footer>
     </main>
   )
