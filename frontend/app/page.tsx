@@ -165,14 +165,14 @@ export default function Home() {
                       <CheckCircle className="w-8 h-8" />
                     </div>
                     <h3 className="text-lg font-semibold text-slate-900">{file.name}</h3>
-                    <p className="text-sm text-slate-500 mb-6">Uploaded Successfully</p>
+                    <p className="text-sm text-slate-500 mb-6">{uploadSuccess ? "Analysis Complete" : "Ready to analyze"}</p>
 
                     {loading ? (
                       <div className="space-y-3">
                         <Progress value={progress} className="h-2" />
                         <p className="text-xs text-slate-400 font-mono">EXTRACTING_SKILLS...</p>
                       </div>
-                    ) : (
+                    ) : uploadSuccess ? (
                       <div className="space-y-4">
                         <div className="bg-indigo-50 border border-indigo-100 p-3 rounded-lg">
                           <p className="text-xs text-indigo-500 uppercase font-bold tracking-wider mb-1">Detected Role</p>
@@ -184,6 +184,10 @@ export default function Home() {
                           Start Interview <ArrowRight className="ml-2 w-5 h-5" />
                         </Button>
                       </div>
+                    ) : (
+                      <Button onClick={handleUpload} size="lg" className="w-full h-12 text-lg rounded-xl shadow-lg shadow-primary/25">
+                        Analyze Resume <ArrowRight className="ml-2 w-5 h-5" />
+                      </Button>
                     )}
                   </motion.div>
                 ) : (
