@@ -9,7 +9,7 @@ import confetti from "canvas-confetti"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Loader2, CheckCircle2, XCircle, ArrowLeft, Trophy, ArrowRight, RotateCcw } from "lucide-react"
+import { Loader2, CheckCircle2, XCircle, ArrowLeft, Trophy, ArrowRight, RotateCcw, Timer, Flame } from "lucide-react"
 
 interface Question {
     question: string
@@ -27,10 +27,36 @@ export default function QuizPage() {
     const [isAnswered, setIsAnswered] = useState(false)
     const [score, setScore] = useState(0)
     const [showResults, setShowResults] = useState(false)
+    const [streak, setStreak] = useState(0)
+    const [timeLeft, setTimeLeft] = useState(30)
+    const [timerActive, setTimerActive] = useState(false)
+
+    useEffect(() => {
+        if (!timerActive || isAnswered) return
+
+        const timer = setInterval(() => {
+            setTimeLeft((prev) => {
+                if (prev <= 1) {
+                    clearInterval(timer)
+                    handleTimeUp()
+                    return 0
+                }
+                return prev - 1
+            })
+        }, 1000)
+
+        return () => clearInterval(timer)
+    }, [timerActive, isAnswered])
+
+    const handleTimeUp = () => {
+        setIsAnswered(true)
+        setStreak(0)
+    }
 
     useEffect(() => {
         const fetchQuiz = async () => {
             const resumeData = localStorage.getItem("resumeData")
+            // ... existing fetch logic ...
             if (!resumeData) {
                 router.push("/")
                 return
@@ -47,6 +73,8 @@ export default function QuizPage() {
 
                 if (questionsData && questionsData.length > 0) {
                     setQuestions(questionsData)
+                    setTimerActive(true)
+                    setTimeLeft(30)
                 } else {
                     throw new Error("No questions returned")
                 }
@@ -85,12 +113,15 @@ export default function QuizPage() {
         setIsAnswered(true)
         if (selectedOption === questions[currentIdx].correct_answer) {
             setScore(prev => prev + 1)
+            setStreak(prev => prev + 1)
             confetti({
                 particleCount: 30,
                 spread: 30,
                 origin: { y: 0.8 },
                 colors: ['#22c55e', '#4ade80']
             })
+        } else {
+            setStreak(0)
         }
     }
 
@@ -99,6 +130,8 @@ export default function QuizPage() {
             setCurrentIdx(prev => prev + 1)
             setSelectedOption(null)
             setIsAnswered(false)
+            setTimeLeft(30)
+            setTimerActive(true)
         } else {
             setShowResults(true)
             confetti({
@@ -128,7 +161,7 @@ export default function QuizPage() {
     if (loading) return (
         <div className="flex h-screen flex-col items-center justify-center bg-[#050a14]">
             <Loader2 className="h-10 w-10 animate-spin text-cyan-500 mb-4" />
-            <span className="text-cyan-400 font-mono tracking-widest">INITIALIZING_ASSESSMENT_PROTOCOL...</span>
+            <span className="text-cyan-400 font-mono tracking-widest text-glitch" data-text="INITIALIZING_ASSESSMENT_PROTOCOL...">INITIALIZING_ASSESSMENT_PROTOCOL...</span>
         </div>
     )
 
@@ -181,8 +214,16 @@ export default function QuizPage() {
                     <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")} className="text-slate-500 hover:text-white hover:bg-white/5 font-mono">
                         <ArrowLeft className="mr-2 h-4 w-4" /> ABORT
                     </Button>
-                    <div className="flex flex-col items-end">
-                        <span className="text-sm font-bold text-cyan-500 font-mono">SEQ_0{currentIdx + 1} // 0{questions.length}</span>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 bg-[#ffe600]/10 px-3 py-1 border border-[#ffe600]/50 text-[#ffe600] font-mono text-sm tracking-widest clip-path-slant">
+                            <Flame className={`w-4 h-4 ${streak > 2 ? 'animate-bounce' : ''}`} fill={streak > 0 ? "#ffe600" : "none"} />
+                            <span>STREAK: {streak}</span>
+                        </div>
+                        <div className={`flex items-center gap-2 px-3 py-1 border font-mono text-sm tracking-widest clip-path-slant transition-all ${timeLeft < 10 ? 'bg-red-950/50 border-red-500 text-red-500 animate-pulse' : 'bg-cyan-950/30 border-cyan-500/50 text-cyan-400'}`}>
+                            <Timer className="w-4 h-4" />
+                            <span>00:{timeLeft.toString().padStart(2, '0')}</span>
+                        </div>
+                        <span className="text-sm font-bold text-slate-500 font-mono">SEQ_0{currentIdx + 1} // 0{questions.length}</span>
                     </div>
                 </div>
 

@@ -74,15 +74,18 @@ class LLMHandler:
         if not self.is_configured(): return []
         skills_str = ", ".join(skills[:5])
         prompt = f"""
-        Generate 5 Multiple Choice Questions (MCQ) testing these skills: {skills_str}.
+        Act as a Senior Technical Interviewer.
+        Generate 5 TOUGH, Scenario-based Multiple Choice Questions (MCQ) testing these skills: {skills_str}.
+        Focus on: Edge cases, System Design trade-offs, and Debugging scenarios. Avoid usage definitions.
+        
         Return JSON Object with key "questions":
         {{
             "questions": [
                 {{
-                    "question": "...",
+                    "question": "Scenario: ... What is the best approach?",
                     "options": ["A", "B", "C", "D"],
                     "correct_answer": "A",
-                    "explanation": "..."
+                    "explanation": "Detailed engineering explanation..."
                 }}
             ]
         }}
