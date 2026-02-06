@@ -67,7 +67,7 @@ export default function DashboardPage() {
                             className="text-4xl font-bold text-white font-orbitron tracking-widest flex items-center gap-3"
                         >
                             <Terminal className="w-8 h-8 text-cyan-500" />
-                            COMMAND_CENTER
+                            KAUSHAL.AI <span className="text-slate-600 text-2xl">//</span> COMMAND_CENTER
                         </motion.h1>
                         <p className="text-cyan-600/80 mt-2 font-mono tracking-wider ml-1">OPERATIVE_STATUS: ONLINE // TRACKING_MASTERY</p>
                     </div>

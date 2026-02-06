@@ -101,12 +101,12 @@ export default function Home() {
     <main className="min-h-screen bg-[#FAFAFA] text-slate-900 overflow-x-hidden selection:bg-primary/20">
 
       {/* Navbar Placeholder */}
-      <nav className="fixed top-0 w-full z-50 glass border-b border-orange-100/50 px-6 py-4 flex justify-between items-center bg-white/80">
-        <div className="flex items-center gap-2 font-bold text-xl tracking-tighter">
-          <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
+      <nav className="fixed top-0 w-full z-50 glass border-b border-cyan-900/30 px-6 py-4 flex justify-between items-center bg-[#050a14]/80 backdrop-blur-md">
+        <div className="flex items-center gap-2 font-bold text-xl tracking-tighter group cursor-pointer">
+          <div className="w-8 h-8 bg-cyan-950/50 border border-cyan-500/50 rounded-none flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] transition-all duration-300">
             <BrainCircuit className="w-5 h-5" />
           </div>
-          <span className="text-slate-900">Kaushal<span className="text-orange-600">.ai</span></span>
+          <span className="text-white font-orbitron tracking-widest text-lg">KAUSHAL<span className="text-cyan-400">.AI</span></span>
         </div>
         <div className="flex gap-4">
           {/* Future Nav Items */}
@@ -347,7 +347,7 @@ export default function Home() {
 
       {/* Simple Footer */}
       <footer className="py-12 text-center text-slate-600 text-sm bg-[#020408] border-t border-white/5 font-mono">
-        <p className="opacity-50">SYSTEM_ID: Kaushal.ai // <span className="text-cyan-500">ONLINE</span></p>
+        <p className="opacity-50">SYSTEM_ID: KAUSHAL.AI // <span className="text-cyan-500">ONLINE</span></p>
         <p className="mt-2 text-xs">Built for the next generation of engineers.</p>
       </footer>
     </main>
