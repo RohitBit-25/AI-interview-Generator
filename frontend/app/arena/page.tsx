@@ -73,7 +73,7 @@ export default function ArenaPage() {
                     </Button>
                     <h1 className="font-bold text-white flex items-center font-orbitron tracking-wider">
                         <Code2 className="mr-2 h-5 w-5 text-cyan-400" />
-                        CODING_ARENA
+                        <span className="opacity-50 mr-2">KAUSHAL.AI //</span> CODING_ARENA
                     </h1>
                 </div>
                 <div className="flex items-center space-x-2">
