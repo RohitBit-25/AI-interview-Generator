@@ -136,6 +136,34 @@ class LLMHandler:
         """
         return self._generate_json(prompt)
 
+    def detect_role_from_resume(self, resume_text: str) -> str:
+        """
+        Analyzes the resume text to determine the candidate's primary job role.
+        """
+        if not self.is_configured(): return "Software Engineer"
+        prompt = f"""
+        Analyze the following resume text and identify the single most appropriate job role title for this candidate.
+        Examples: "Frontend Engineer", "Data Scientist", "DevOps Engineer", "Project Manager", "Python Developer".
+        Return ONLY the role title, nothing else.
+
+        Resume Text:
+        {resume_text[:2000]}
+        """
+        try:
+            role = self.client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": "You are an expert HR recruiter."},
+                    {"role": "user", "content": prompt}
+                ],
+                model="llama3-8b-8192",
+                temperature=0.1,
+            ).choices[0].message.content.strip()
+            # Cleanup if the model returns extra chars
+            return role.split('\n')[0].replace('"', '').strip()
+        except Exception as e:
+            print(f"Role detection error: {e}")
+            return "Software Engineer"
+
     def _generate_json(self, prompt: str) -> Any:
         try:
             completion = self.client.chat.completions.create(

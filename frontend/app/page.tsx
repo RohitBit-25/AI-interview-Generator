@@ -69,9 +69,8 @@ export default function Home() {
       setProgress(100)
       localStorage.setItem("resumeData", JSON.stringify(response.data.data))
 
-      setTimeout(() => {
-        router.push("/interview")
-      }, 500)
+      // Stop loading to show the specific success UI with detected role
+      setLoading(false)
 
     } catch (err) {
       console.error(err)
@@ -164,7 +163,7 @@ export default function Home() {
                       <CheckCircle className="w-8 h-8" />
                     </div>
                     <h3 className="text-lg font-semibold text-slate-900">{file.name}</h3>
-                    <p className="text-sm text-slate-500 mb-6">Ready to analyze</p>
+                    <p className="text-sm text-slate-500 mb-6">Uploaded Successfully</p>
 
                     {loading ? (
                       <div className="space-y-3">
@@ -172,9 +171,17 @@ export default function Home() {
                         <p className="text-xs text-slate-400 font-mono">EXTRACTING_SKILLS...</p>
                       </div>
                     ) : (
-                      <Button onClick={handleUpload} size="lg" className="w-full h-12 text-lg rounded-xl shadow-lg shadow-primary/25">
-                        Start Interview <ArrowRight className="ml-2 w-5 h-5" />
-                      </Button>
+                      <div className="space-y-4">
+                        <div className="bg-indigo-50 border border-indigo-100 p-3 rounded-lg">
+                          <p className="text-xs text-indigo-500 uppercase font-bold tracking-wider mb-1">Detected Role</p>
+                          <p className="text-lg font-bold text-indigo-900">
+                            {JSON.parse(localStorage.getItem("resumeData") || "{}").detected_role || "Software Engineer"}
+                          </p>
+                        </div>
+                        <Button onClick={() => router.push("/interview")} size="lg" className="w-full h-12 text-lg rounded-xl shadow-lg shadow-primary/25">
+                          Start Interview <ArrowRight className="ml-2 w-5 h-5" />
+                        </Button>
+                      </div>
                     )}
                   </motion.div>
                 ) : (

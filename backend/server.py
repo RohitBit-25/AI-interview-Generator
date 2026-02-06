@@ -99,9 +99,21 @@ async def upload_resume(file: UploadFile = File(...)):
         text = parser.text
         
         # Clean up
-        os.remove(temp_path)
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+            
+        # Auto-Detect Role
+        detected_role = "Software Engineer"
+        if API_KEY:
+             detected_role = llm.detect_role_from_resume(text)
         
-        return {"data": {"text": text, "parsed": parsed_data}}
+        return {
+            "data": {
+                "text": text, 
+                "parsed": parsed_data,
+                "detected_role": detected_role
+            }
+        }
     except Exception as e:
         logger.error(f"Upload error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
