@@ -238,6 +238,33 @@ async def submit_arena(req: ArenaSubmitRequest):
         return review
     raise HTTPException(status_code=400, detail="API_KEY required")
 
+class LogRequest(BaseModel):
+    role: str
+    difficulty: str
+    question: str
+    answer: str
+    feedback: str
+    rating: int
+    type: str
+
+@app.post("/api/log")
+async def log_interaction(req: LogRequest):
+    try:
+        db.save_interaction(
+            session_id=SESSION_ID,
+            role=req.role,
+            difficulty=req.difficulty,
+            question=req.question,
+            answer=req.answer,
+            feedback=req.feedback,
+            rating=req.rating,
+            q_type=req.type
+        )
+        return {"status": "ok"}
+    except Exception as e:
+        logger.error(f"Log error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

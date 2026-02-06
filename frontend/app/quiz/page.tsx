@@ -106,6 +106,22 @@ export default function QuizPage() {
                 spread: 70,
                 origin: { y: 0.6 }
             })
+
+            // Log Result to Backend
+            try {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+                axios.post(`${apiUrl}/api/log`, {
+                    role: "Candidate",
+                    difficulty: "Medium",
+                    question: "Quiz Session",
+                    answer: `Score: ${score + (questions[currentIdx].correct_answer === selectedOption ? 1 : 0)}/${questions.length}`,
+                    feedback: "Completed",
+                    rating: Math.round(((score + (questions[currentIdx].correct_answer === selectedOption ? 1 : 0)) / questions.length) * 10),
+                    type: "Quiz"
+                })
+            } catch (e) {
+                console.error("Failed to log result", e)
+            }
         }
     }
 
