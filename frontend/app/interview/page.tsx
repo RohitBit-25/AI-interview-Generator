@@ -256,7 +256,14 @@ export default function InterviewPage() {
                                     {[...Array(15)].map((_, i) => (
                                         <motion.div
                                             key={i}
-                                            animate={{ height: isListening ? Math.max(4, Math.random() * 40) : 4 }}
+                                            animate={{
+                                                height: isListening ? [4, Math.random() * 40, 4] : 4,
+                                                transition: {
+                                                    repeat: Infinity,
+                                                    duration: 0.5,
+                                                    delay: i * 0.05
+                                                }
+                                            }}
                                             className={`w-1.5 rounded-full transition-colors duration-300 ${isListening ? 'bg-indigo-500' : (cinemaMode ? 'bg-slate-700' : 'bg-slate-200')}`}
                                         />
                                     ))}
@@ -267,8 +274,8 @@ export default function InterviewPage() {
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         className={`rounded-xl p-6 backdrop-blur-md border ${feedback.rating >= 7
-                                                ? (cinemaMode ? 'bg-green-900/20 border-green-800' : 'bg-green-50 border-green-200')
-                                                : (cinemaMode ? 'bg-amber-900/20 border-amber-800' : 'bg-amber-50 border-amber-200')
+                                            ? (cinemaMode ? 'bg-green-900/20 border-green-800' : 'bg-green-50 border-green-200')
+                                            : (cinemaMode ? 'bg-amber-900/20 border-amber-800' : 'bg-amber-50 border-amber-200')
                                             }`}
                                     >
                                         <div className="flex items-center gap-3 mb-2">
@@ -305,8 +312,8 @@ export default function InterviewPage() {
                                         onClick={toggleRecording}
                                         disabled={evaluating || !!feedback}
                                         className={`rounded-full h-12 w-12 border-0 shadow-lg transition-all hover:scale-105 active:scale-95 ${isListening
-                                                ? "bg-red-500 hover:bg-red-600 text-white animate-pulse shadow-red-500/30"
-                                                : (cinemaMode ? "bg-slate-800 hover:bg-slate-700 text-slate-300" : "bg-white hover:bg-slate-50")
+                                            ? "bg-red-500 hover:bg-red-600 text-white animate-pulse shadow-red-500/30"
+                                            : (cinemaMode ? "bg-slate-800 hover:bg-slate-700 text-slate-300" : "bg-white hover:bg-slate-50")
                                             }`}
                                     >
                                         {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
