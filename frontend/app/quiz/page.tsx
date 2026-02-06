@@ -43,7 +43,17 @@ export default function QuizPage() {
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
                 const response = await axios.post(`${apiUrl}/api/quiz`, { skills })
                 // Fallback mock if API returns empty or fails structure
-                setQuestions(response.data.questions || [
+                const questionsData = response.data.questions
+
+                if (questionsData && questionsData.length > 0) {
+                    setQuestions(questionsData)
+                } else {
+                    throw new Error("No questions returned")
+                }
+            } catch (error) {
+                console.error("Quiz Error:", error)
+                // Fallback on error
+                setQuestions([
                     {
                         question: "Which hook is used for side effects in React?",
                         options: ["useState", "useEffect", "useMemo", "useCallback"],
@@ -57,8 +67,6 @@ export default function QuizPage() {
                         explanation: "Binary search divides the search interval in half effectively reducing checks logarithmically."
                     }
                 ])
-            } catch (error) {
-                console.error("Quiz Error:", error)
             } finally {
                 setLoading(false)
             }
@@ -176,7 +184,7 @@ export default function QuizPage() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-6 grid gap-3">
-                                {currentQ?.options.map((option, idx) => {
+                                {currentQ?.options?.map((option, idx) => {
                                     const isSelected = selectedOption === option
                                     const isCorrect = currentQ.correct_answer === option
 
@@ -198,7 +206,7 @@ export default function QuizPage() {
                                             className={`relative flex w-full items-center rounded-xl border-2 p-4 text-left transition-all duration-200 ${variantClass}`}
                                         >
                                             <span className={`mr-4 flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold ${isAnswered && isCorrect ? "border-green-600 bg-green-200 text-green-800" :
-                                                    isSelected ? "border-primary bg-primary text-white" : "border-slate-300 text-slate-500"
+                                                isSelected ? "border-primary bg-primary text-white" : "border-slate-300 text-slate-500"
                                                 }`}>
                                                 {String.fromCharCode(65 + idx)}
                                             </span>

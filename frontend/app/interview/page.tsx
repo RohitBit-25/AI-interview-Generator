@@ -132,7 +132,8 @@ export default function InterviewPage() {
             setUserAnswer("")
             setFeedback(null)
         } else {
-            // Either finished or error state, go to dashboard
+            // Finished
+            alert("Interview Completed! Redirecting to Dashboard...")
             router.push("/dashboard")
         }
     }
