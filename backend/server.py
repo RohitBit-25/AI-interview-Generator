@@ -139,40 +139,36 @@ async def next_question(req: InterviewNextRequest):
     try:
         evaluation = {}
         if not req.skipped and API_KEY:
-            # Evaluate current answer
-            current_q_text = req.history[-1]['question'] if req.history else "Intro"
-            evaluation = llm.evaluate_answer(current_q_text, req.last_answer)
+            # Optimized Flow: Single combined call for evaluation + adaptive next question
+            result = llm.continue_interview(req.resume_text, req.history, req.last_answer)
             
-            # Save to DB
-            db.save_interaction(
-                session_id=SESSION_ID,
-                role="Software Engineer",
-                difficulty="Medium",
-                question=current_q_text,
-                answer=req.last_answer,
-                feedback=evaluation.get("feedback", ""),
-                rating=evaluation.get("rating", 0),
-                q_type="Interview"
-            )
+            if result:
+                evaluation = result.get("evaluation", {})
+                next_q = result.get("next_question", None)
+                
+                # Save to DB
+                db.save_interaction(
+                    session_id=SESSION_ID,
+                    role="Software Engineer",
+                    difficulty="Medium",
+                    question=req.history[-1]['question'] if req.history else "Intro",
+                    answer=req.last_answer,
+                    feedback=evaluation.get("feedback", ""),
+                    rating=evaluation.get("rating", 0),
+                    q_type="Interview"
+                )
+                
+                return {
+                    "evaluation": evaluation,
+                    "next_question": next_q
+                }
         
-        # Generate NEXT question
-        # For simplicity, we ask LLM for the NEXT question based on history
-        # Or we could have generated a list at start. 
-        # Let's simple-gen a new one dynamics
+        # Fallback or Skip Logic
+        # ... existing fallback code if needed, but for now we rely on continue_interview
         
-        next_q_prompt = f"Ask a follow up question based on recent history: {len(req.history)} questions asked."
-        if API_KEY:
-             # In a real app we'd pass history context to LLM
-             questions = llm.generate_questions(req.resume_text, "Candidate", "Medium")
-             # Pick a random new one or next in list logic
-             import random
-             next_q = random.choice(questions) if questions else None
-        else:
-             raise HTTPException(status_code=400, detail="API_KEY required")
-
         return {
-            "evaluation": evaluation,
-            "next_question": next_q
+            "evaluation": {"feedback": "Skipped or API Error", "rating": 0},
+            "next_question": {"question": "Describe a challenging project you worked on.", "type": "Behavioral", "topic": "Project"}
         }
     except Exception as e:
         logger.error(f"Next error: {e}")
@@ -214,13 +210,11 @@ async def text_to_speech(req: dict):
 @app.post("/api/listen")
 async def speech_to_text(file: UploadFile = File(...)):
     try:
-        # Save blob
-        temp_audio = f"temp_{file.filename}"
-        with open(temp_audio, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-            
-        text = voice.transcribe_audio(open(temp_audio, "rb").read())
-        os.remove(temp_audio)
+        # Read bytes directly
+        file_bytes = await file.read()
+        text = voice.transcribe_audio(file_bytes)
+        
+        # Cleanup not needed as we read bytes directly
         return {"text": text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

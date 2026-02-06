@@ -25,15 +25,34 @@ class VoiceHandler:
             print(f"Error generating audio: {e}")
             return None
 
-    def transcribe_audio(self, audio_file_path: str) -> str:
+    def transcribe_audio(self, audio_data: bytes) -> str:
         """
-        Transcribes audio file to text using Google Speech Recognition.
+        Transcribes audio bytes (webm/wav/etc) to text using Google Speech Recognition.
+        Handles conversion to WAV using pydub.
         """
         try:
-            with sr.AudioFile(audio_file_path) as source:
-                audio_data = self.recognizer.record(source)
-                text = self.recognizer.recognize_google(audio_data)
+            from pydub import AudioSegment
+            from io import BytesIO
+
+            # Load any incoming audio format (WebM, etc.) and export as WAV
+            audio_segment = AudioSegment.from_file(BytesIO(audio_data))
+            
+            # Export to a wav buffer for SpeechRecognition
+            wav_buffer = BytesIO()
+            audio_segment.export(wav_buffer, format="wav")
+            wav_buffer.seek(0)
+            
+            with sr.AudioFile(wav_buffer) as source:
+                # audio = self.recognizer.record(source)
+                # Adjust for ambient noise for better accuracy
+                self.recognizer.adjust_for_ambient_noise(source)
+                audio = self.recognizer.record(source)
+                
+                text = self.recognizer.recognize_google(audio)
                 return text
+
+        except ImportError:
+            return "Error: pydub/ffmpeg not installed for conversion."
         except sr.UnknownValueError:
             return "Could not understand audio"
         except sr.RequestError as e:
