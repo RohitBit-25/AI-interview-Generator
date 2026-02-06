@@ -101,12 +101,12 @@ export default function Home() {
     <main className="min-h-screen bg-[#FAFAFA] text-slate-900 overflow-x-hidden selection:bg-primary/20">
 
       {/* Navbar Placeholder */}
-      <nav className="fixed top-0 w-full z-50 glass border-b border-black/5 px-6 py-4 flex justify-between items-center">
+      <nav className="fixed top-0 w-full z-50 glass border-b border-orange-100/50 px-6 py-4 flex justify-between items-center bg-white/80">
         <div className="flex items-center gap-2 font-bold text-xl tracking-tighter">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+          <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
             <BrainCircuit className="w-5 h-5" />
           </div>
-          PrepAI
+          <span className="text-slate-900">Kaushal<span className="text-orange-600">.ai</span></span>
         </div>
         <div className="flex gap-4">
           {/* Future Nav Items */}
@@ -114,10 +114,10 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6 md:px-12 lg:px-24">
-        {/* Abstract Shapes */}
-        <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-purple-200/50 rounded-full blur-3xl opacity-50 mix-blend-multiply animate-blob pointer-events-none" />
-        <div className="absolute bottom-20 left-0 w-[500px] h-[500px] bg-blue-200/50 rounded-full blur-3xl opacity-50 mix-blend-multiply animate-blob animation-delay-2000 pointer-events-none" />
+      <section className="relative pt-32 pb-20 px-6 md:px-12 lg:px-24 bg-mandala overflow-hidden">
+        {/* Abstract Shapes - Warm Colors */}
+        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-orange-200/40 rounded-full blur-3xl mix-blend-multiply animate-pulse pointer-events-none" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-teal-200/40 rounded-full blur-3xl mix-blend-multiply animate-pulse animation-delay-2000 pointer-events-none" />
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -125,17 +125,18 @@ export default function Home() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center max-w-4xl mx-auto mb-16 relative z-10"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm mb-8">
-            <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-            <span className="text-sm font-medium text-slate-600">v2.0 Now Live with Coding Arena</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-orange-200 shadow-sm mb-8">
+            <span className="flex h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
+            <span className="text-sm font-medium text-slate-600">v2.0 | India's #1 Career Copilot</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-[1.1]">
-            The Only <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600">AI Recruiter</span> <br className="hidden md:block" /> That Actually Codes.
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-[1.1] text-slate-900">
+            Master Your Career with <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-red-600 to-indigo-700">Detailed AI Analysis</span>
           </h1>
 
-          <p className="text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Stop practicing with static text. Upload your resume and experience a dynamic, full-stack interview simulation with real-time feedback.
+          <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Upload your resume and let <strong>Kaushal.ai</strong> challenge you with role-specific interview simulation, rigorous coding tests, and direct feedback.
           </p>
         </motion.div>
 
