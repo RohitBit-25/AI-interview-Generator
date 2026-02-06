@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${spaceGrotesk.variable} antialiased font-sans`}
+        className={`${outfit.variable} ${eczar.variable} antialiased font-sans`}
       >
         {children}
       </body>
