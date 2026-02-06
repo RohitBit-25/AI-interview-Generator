@@ -77,56 +77,12 @@ class QuizRequest(BaseModel):
 @app.post("/api/quiz")
 async def generate_quiz(req: QuizRequest):
     try:
-        # Prompt LLM for quiz questions
         if API_KEY:
-            # We would normally implement a specific method in LLMHandler for this
-            # For now, we reuse generate_questions or mock it if method doesn't exist
-            # Assuming we need a new method or can adapt.
-            # Let's mock the structure for reliability in this "Demo" phase if llm handler update is too risky
-            # But the plan said "Generate", so let's try to prompt or fallback.
-            
-            # Since LLMHandler might not have 'generate_quiz', we can try to use a generic prompt if available,
-            # or just return a robust static set that varies slightly, OR we implement generate_quiz in LLMHandler.
-            # Given user wants "No Error", a robust fallback + attempt is best.
-            
-            # Mocking for speed/stability as requested "run without error"
-            # In real prod, we would add llm.generate_quiz(req.skills)
-            pass
-            
-        return {
-            "questions": [
-                {
-                    "question": f"Explain the concept of {req.skills[0] if req.skills else 'polymorphism'} in this context.",
-                    "options": ["A", "B", "C", "D"],
-                    "correct_answer": "A",
-                    "explanation": "Explanation here."
-                },
-                {
-                    "question": "What is the time complexity of QuickSort?",
-                    "options": ["O(n)", "O(n log n)", "O(n^2)", "O(1)"],
-                    "correct_answer": "O(n log n)",
-                    "explanation": "Average case is n log n."
-                },
-                {
-                     "question": "Which HTTP method is idempotent?",
-                     "options": ["POST", "PUT", "GET", "DELETE"],
-                     "correct_answer": "PUT",
-                     "explanation": "PUT is idempotent."
-                },
-                 {
-                     "question": "What is Docker?",
-                     "options": ["OS", "Containerization", "VM", "IDE"],
-                     "correct_answer": "Containerization",
-                     "explanation": "Docker is a platform for developing, shipping, and running applications in containers."
-                },
-                 {
-                     "question": "What does SQL stand for?",
-                     "options": ["Structured Query Language", "Simple Query Language", "Standard Query List", "None"],
-                     "correct_answer": "Structured Query Language",
-                     "explanation": "SQL is the standard language for relational databases."
-                }
-            ]
-        }
+            # Dynamic Generation
+            quiz_questions = llm.generate_quiz(req.skills)
+            return {"questions": quiz_questions}
+        else:
+            raise HTTPException(status_code=400, detail="API_KEY required for dynamic quiz")
     except Exception as e:
         logger.error(f"Quiz error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -212,17 +168,27 @@ async def next_question(req: InterviewNextRequest):
 
 @app.get("/api/dashboard")
 async def get_dashboard_stats():
-    # Mock data for now to prevent 404s
-    return [
-        {
-            "question": "Tell me about yourself.",
-            "user_answer": "I am a software engineer...",
-            "rating": 8,
-            "topic": "Behavioral",
-            "feedback": "Good introduction.",
-            "timestamp": "2024-01-01T12:00:00"
-        }
-    ]
+    try:
+        df = db.get_analytics()
+        if df.empty:
+            return []
+        
+        # Convert DataFrame to list of dicts for JSON response
+        # We process it to match the dashboard frontend expectation
+        stats = []
+        for _, row in df.iterrows():
+            stats.append({
+                "question": row['question'],
+                "user_answer": row['answer'],
+                "rating": row['rating'],
+                "topic": row.get('role', 'General'), # Reuse role as topic/tag for now
+                "feedback": row['feedback'],
+                "timestamp": row['timestamp']
+            })
+        return stats
+    except Exception as e:
+        logger.error(f"Dashboard error: {e}")
+        return []
 
 @app.post("/api/speak")
 async def text_to_speech(req: dict):
@@ -250,13 +216,9 @@ async def speech_to_text(file: UploadFile = File(...)):
 # Arena Endpoints
 @app.post("/api/arena/problem")
 async def get_arena_problem(req: ArenaProblemRequest):
-    # Mock or LLM gen
-    return {
-        "title": "Reverse Linked List",
-        "description": "Given the head of a singly linked list, reverse the list, and return the reversed list.",
-        "difficulty": "Medium",
-        "starter_code": "def reverseList(head):\n    # Your code here\n    pass"
-    }
+    if API_KEY:
+        return llm.generate_coding_problem(req.resume_text, req.role)
+    raise HTTPException(status_code=400, detail="API_KEY required")
 
 @app.post("/api/arena/submit")
 async def submit_arena(req: ArenaSubmitRequest):
