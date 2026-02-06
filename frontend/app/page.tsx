@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Upload, CheckCircle, AlertCircle, Sparkles, ArrowRight } from "lucide-react"
+import { Upload, CheckCircle, ArrowRight, Zap, Code, MessageSquare, BrainCircuit, Play } from "lucide-react"
 import axios from "axios"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -81,155 +81,231 @@ export default function Home() {
     }
   }
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  }
+
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background p-6 md:p-24 selection:bg-primary selection:text-white">
+    <main className="min-h-screen bg-[#FAFAFA] text-slate-900 overflow-x-hidden selection:bg-primary/20">
 
-      {/* Background Decor */}
-      <div className="absolute inset-0 z-0 bg-dot-pattern opacity-40 pointer-events-none" />
-      <div className="absolute top-[-10%] right-[-5%] h-[500px] w-[500px] rounded-full bg-primary/5 blur-3xl" />
-      <div className="absolute bottom-[-10%] left-[-5%] h-[500px] w-[500px] rounded-full bg-blue-500/5 blur-3xl" />
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="z-10 w-full max-w-3xl text-center"
-      >
-        <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-6 shadow-sm">
-          <Sparkles className="mr-2 h-3.5 w-3.5" />
-          <span>AI-Powered Interview Coach</span>
+      {/* Navbar Placeholder */}
+      <nav className="fixed top-0 w-full z-50 glass border-b border-black/5 px-6 py-4 flex justify-between items-center">
+        <div className="flex items-center gap-2 font-bold text-xl tracking-tighter">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+            <BrainCircuit className="w-5 h-5" />
+          </div>
+          PrepAI
         </div>
+        <div className="flex gap-4">
+          {/* Future Nav Items */}
+        </div>
+      </nav>
 
-        <h1 className="text-4xl font-extrabold tracking-tight text-foreground md:text-6xl lg:leading-tight">
-          Master Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-violet-500">Interview</span>
-        </h1>
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 px-6 md:px-12 lg:px-24">
+        {/* Abstract Shapes */}
+        <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-purple-200/50 rounded-full blur-3xl opacity-50 mix-blend-multiply animate-blob pointer-events-none" />
+        <div className="absolute bottom-20 left-0 w-[500px] h-[500px] bg-blue-200/50 rounded-full blur-3xl opacity-50 mix-blend-multiply animate-blob animation-delay-2000 pointer-events-none" />
 
-        <p className="mt-6 text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto leading-relaxed">
-          Unlock your potential with personalized, AI-generated questions tailored specifically to your resume.
-        </p>
-      </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center max-w-4xl mx-auto mb-16 relative z-10"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm mb-8">
+            <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span className="text-sm font-medium text-slate-600">v2.0 Now Live with Coding Arena</span>
+          </div>
 
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="z-10 mt-12 w-full max-w-xl"
-      >
-        <Card className="overflow-hidden border-border/60 bg-white/80 backdrop-blur-xl shadow-2xl">
-          <CardContent className="p-8">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-[1.1]">
+            The Only <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600">AI Recruiter</span> <br className="hidden md:block" /> That Actually Codes.
+          </h1>
+
+          <p className="text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Stop practicing with static text. Upload your resume and experience a dynamic, full-stack interview simulation with real-time feedback.
+          </p>
+        </motion.div>
+
+        {/* Upload Puck - Central Interaction */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="relative z-20 max-w-xl mx-auto"
+        >
+          <div className={`p-1 rounded-2xl bg-gradient-to-b from-white to-slate-50 shadow-2xl transition-all duration-300 ${isDragging ? "ring-4 ring-primary/20 scale-[1.02]" : ""}`}>
             <div
               onDragOver={onDragOver}
               onDragLeave={onDragLeave}
               onDrop={onDrop}
-              className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300 ${isDragging
-                ? "border-primary bg-primary/5 scale-[1.01]"
-                : file
-                  ? "border-green-500/50 bg-green-50/50"
-                  : "border-slate-200 hover:border-primary/50 hover:bg-slate-50"
-                } px-6 py-12 text-center`}
+              className="bg-white rounded-xl border border-dashed border-slate-300 p-8 text-center hover:border-primary/50 transition-colors"
             >
               <AnimatePresence mode="wait">
                 {file ? (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className="flex flex-col items-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="py-4"
                   >
-                    <div className="mb-4 rounded-full bg-green-100 p-3 ring-4 ring-green-50">
-                      <CheckCircle className="h-8 w-8 text-green-600" />
+                    <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-600">
+                      <CheckCircle className="w-8 h-8" />
                     </div>
-                    <p className="text-lg font-semibold text-slate-900">{file.name}</p>
-                    <p className="text-sm text-slate-500 mb-4">{(file.size / 1024).toFixed(2)} KB</p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => { e.stopPropagation(); setFile(null); }}
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      disabled={loading}
-                    >
-                      Remove File
-                    </Button>
+                    <h3 className="text-lg font-semibold text-slate-900">{file.name}</h3>
+                    <p className="text-sm text-slate-500 mb-6">Ready to analyze</p>
+
+                    {loading ? (
+                      <div className="space-y-3">
+                        <Progress value={progress} className="h-2" />
+                        <p className="text-xs text-slate-400 font-mono">EXTRACTING_SKILLS...</p>
+                      </div>
+                    ) : (
+                      <Button onClick={handleUpload} size="lg" className="w-full h-12 text-lg rounded-xl shadow-lg shadow-primary/25">
+                        Start Interview <ArrowRight className="ml-2 w-5 h-5" />
+                      </Button>
+                    )}
                   </motion.div>
                 ) : (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex flex-col items-center"
+                    className="py-8"
                   >
-                    <div className="mb-4 rounded-full bg-slate-100 p-4 transition-transform group-hover:scale-110">
-                      <Upload className="h-8 w-8 text-slate-400" />
+                    <div className="mx-auto w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-6 text-slate-400 group-hover:text-primary transition-colors">
+                      <Upload className="w-8 h-8" />
                     </div>
-                    <p className="text-lg font-medium text-slate-900">
-                      Drag & drop your resume
-                    </p>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Supports PDF or TXT up to 5MB
-                    </p>
-                    <div className="mt-6">
-                      <Button
-                        variant="outline"
-                        onClick={() => document.getElementById("resume")?.click()}
-                        className="rounded-full px-8"
-                      >
-                        Browse Files
-                      </Button>
-                    </div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Drop your resume here</h3>
+                    <p className="text-slate-500 mb-8">PDF or TXT (Max 5MB)</p>
+                    <Button
+                      onClick={() => document.getElementById("resume-upload")?.click()}
+                      variant="outline"
+                      className="rounded-full px-8"
+                    >
+                      Browse Files
+                    </Button>
                   </motion.div>
                 )}
               </AnimatePresence>
-
-              <Input
-                id="resume"
+              <input
+                id="resume-upload"
                 type="file"
                 accept=".pdf,.txt"
                 className="hidden"
                 onChange={handleFileChange}
               />
             </div>
+          </div>
+          {/* Error Toast */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="absolute -bottom-16 left-0 right-0 bg-red-50 text-red-600 text-sm py-3 px-4 rounded-lg text-center border border-red-100"
+            >
+              {error}
+            </motion.div>
+          )}
+        </motion.div>
+      </section>
 
-            {loading && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                className="mt-6 space-y-2"
-              >
-                <div className="flex justify-between text-xs font-medium text-slate-500">
-                  <span>Analyzing content...</span>
-                  <span>{progress}%</span>
+      {/* Bento Grid Features */}
+      <section className="py-24 px-6 md:px-12 lg:px-24 bg-white border-t border-slate-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-16 text-center">
+            <h2 className="text-3xl font-bold tracking-tight mb-4">Everything needed to ace the technical round</h2>
+            <p className="text-slate-500">Comprehensive preparation tools in one platform.</p>
+          </div>
+
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]"
+          >
+            {/* Large Card - Interview */}
+            <motion.div variants={item} className="md:col-span-2 group relative overflow-hidden rounded-3xl bg-slate-50 border border-slate-100 p-8 flex flex-col justify-between hover:shadow-xl transition-all duration-500 hover:border-indigo-100/50">
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-4 text-indigo-600">
+                  <MessageSquare className="w-6 h-6" />
                 </div>
-                <Progress value={progress} className="h-2 rounded-full bg-slate-100" />
-              </motion.div>
-            )}
+                <h3 className="text-2xl font-bold mb-2">Adaptive Interview</h3>
+                <p className="text-slate-500 max-w-md">Our AI adapts to your responses, asking follow-up questions just like a real interviewer. Supports Voice and Text.</p>
+              </div>
+              {/* Abstract UI Mockup */}
+              <div className="absolute right-[-20px] bottom-[-20px] w-2/3 h-2/3 bg-white rounded-tl-2xl shadow-2xl border border-slate-100 p-4 transition-transform group-hover:translate-x-[-10px] group-hover:translate-y-[-10px]">
+                <div className="flex gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-full bg-indigo-100" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-2 bg-slate-100 rounded w-3/4" />
+                    <div className="h-2 bg-slate-100 rounded w-1/2" />
+                  </div>
+                </div>
+                <div className="flex gap-2 flex-row-reverse">
+                  <div className="w-8 h-8 rounded-full bg-slate-200" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-8 bg-indigo-600 rounded-lg w-full" />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
 
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-6 flex items-center space-x-2 rounded-lg bg-red-50 p-4 text-sm text-red-600 border border-red-100"
-              >
-                <AlertCircle className="h-5 w-5 shrink-0" />
-                <p>{error}</p>
-              </motion.div>
-            )}
+            {/* Tall Card - Coding */}
+            <motion.div variants={item} className="md:row-span-2 group relative overflow-hidden rounded-3xl bg-[#0F172A] text-white p-8 flex flex-col hover:shadow-2xl transition-all duration-500">
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6 text-white backdrop-blur-sm">
+                <Code className="w-6 h-6" />
+              </div>
+              <h3 className="text-2xl font-bold mb-2">Coding Arena</h3>
+              <p className="text-slate-400 mb-8">Integrated IDE with real-time complexity analysis and test execution.</p>
 
-            <div className="mt-8">
-              <Button
-                className="w-full text-lg h-14 rounded-xl shadow-lg shadow-primary/20"
-                onClick={handleUpload}
-                disabled={!file || loading}
-              >
-                {loading ? (
-                  <span className="flex items-center gap-2">Generating Questions...</span>
-                ) : (
-                  <span className="flex items-center gap-2">Start Interview <ArrowRight className="h-5 w-5" /></span>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+              <div className="flex-1 bg-black/30 rounded-xl border border-white/10 p-4 font-mono text-xs text-green-400">
+                <p>def two_sum(nums, target):</p>
+                <p className="pl-4">seen = {'{}'}</p>
+                <p className="pl-4">for i, n in enumerate(nums):</p>
+                <p className="pl-8">comp = target - n</p>
+                <p className="pl-8 text-white"><span className="animate-pulse">|</span></p>
+              </div>
+            </motion.div>
+
+            {/* Standard Card - Resume */}
+            <motion.div variants={item} className="group relative overflow-hidden rounded-3xl bg-white border border-slate-200 p-8 hover:shadow-lg transition-all">
+              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4 text-orange-600">
+                <Zap className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Instant Analysis</h3>
+              <p className="text-slate-500">Extracts skills and projects from your resume in seconds to tailor the session.</p>
+            </motion.div>
+
+            {/* Standard Card - Quiz */}
+            <motion.div variants={item} className="group relative overflow-hidden rounded-3xl bg-blue-50 border border-blue-100 p-8 hover:shadow-lg transition-all">
+              <div className="w-12 h-12 bg-blue-200 rounded-xl flex items-center justify-center mb-4 text-blue-700">
+                <Play className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Gamified Quizzes</h3>
+              <p className="text-slate-600">Test your domain knowledge with quick-fire technical quizzes.</p>
+            </motion.div>
+
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Simple Footer */}
+      <footer className="py-12 text-center text-slate-400 text-sm">
+        <p>© 2024 PrepAI. Built for engineers.</p>
+      </footer>
     </main>
   )
 }
