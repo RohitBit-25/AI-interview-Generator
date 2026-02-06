@@ -257,10 +257,10 @@ export default function InterviewPage() {
                                         <motion.div
                                             key={i}
                                             animate={{
-                                                height: isListening ? [4, Math.random() * 40, 4] : 4,
+                                                height: isListening ? [4, 15, 8, 30, 12, 40, 6, 20, 4] : 4,
                                                 transition: {
                                                     repeat: Infinity,
-                                                    duration: 0.5,
+                                                    duration: 0.5 + (i * 0.1), // Varied duration per bar
                                                     delay: i * 0.05
                                                 }
                                             }}

@@ -15,6 +15,7 @@ export default function Home() {
   const router = useRouter()
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
+  const [uploadSuccess, setUploadSuccess] = useState(false)
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState("")
   const [isDragging, setIsDragging] = useState(false)
@@ -71,6 +72,7 @@ export default function Home() {
 
       // Stop loading to show the specific success UI with detected role
       setLoading(false)
+      setUploadSuccess(true)
 
     } catch (err) {
       console.error(err)
