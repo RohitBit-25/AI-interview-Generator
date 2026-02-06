@@ -57,48 +57,55 @@ export default function ArenaPage() {
     }
 
     if (loading) return (
-        <div className="flex h-screen items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-            <span className="ml-2">Entering Code Arena...</span>
+        <div className="flex h-screen items-center justify-center bg-[#050a14]">
+            <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
+            <span className="ml-2 text-cyan-400 font-mono tracking-widest">CONNECTING_TO_ARENA_NET...</span>
         </div>
     )
 
     return (
-        <div className="h-screen flex flex-col bg-slate-900 text-slate-100">
-            <header className="flex items-center justify-between border-b border-slate-700 bg-slate-800 p-4">
+        <div className="h-screen flex flex-col bg-[#050a14] text-slate-100 overflow-hidden font-sans">
+            {/* Header */}
+            <header className="flex items-center justify-between border-b border-white/5 bg-[#0a0f1e] p-4 relative z-10">
                 <div className="flex items-center space-x-4">
-                    <Button variant="ghost" size="sm" className="text-slate-300" onClick={() => router.push("/dashboard")}>
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Exit
+                    <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white hover:bg-white/5 font-mono" onClick={() => router.push("/dashboard")}>
+                        <ArrowLeft className="mr-2 h-4 w-4" /> EXIT
                     </Button>
-                    <h1 className="font-bold text-white flex items-center">
-                        <Code2 className="mr-2 h-5 w-5 text-purple-400" />
-                        Coding Arena
+                    <h1 className="font-bold text-white flex items-center font-orbitron tracking-wider">
+                        <Code2 className="mr-2 h-5 w-5 text-cyan-400" />
+                        CODING_ARENA
                     </h1>
                 </div>
                 <div className="flex items-center space-x-2">
-                    <span className="px-2 py-1 rounded bg-slate-700 text-xs text-slate-300">{problem?.difficulty}</span>
+                    <span className="px-3 py-1 rounded-none border border-cyan-500/30 bg-cyan-950/20 text-xs text-cyan-400 font-mono uppercase shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+                        {problem?.difficulty || "EASY"}
+                    </span>
                 </div>
             </header>
 
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden relative">
+                <div className="absolute inset-0 bg-cyber-grid opacity-10 pointer-events-none" />
+
                 {/* Problem Description Panel */}
-                <div className="w-1/3 overflow-y-auto border-r border-slate-700 bg-slate-900 p-6">
-                    <h2 className="mb-4 text-xl font-bold text-white">{problem?.title}</h2>
-                    <div className="prose prose-invert max-w-none text-sm text-slate-300">
+                <div className="w-1/3 overflow-y-auto border-r border-white/10 bg-[#0a0f1e]/80 p-6 backdrop-blur-sm relative z-10">
+                    <h2 className="mb-6 text-xl font-bold text-white font-orbitron tracking-wide border-b border-white/10 pb-4">{problem?.title}</h2>
+                    <div className="prose prose-invert max-w-none text-sm text-slate-300 font-mono leading-relaxed">
                         <p>{problem?.description}</p>
                     </div>
 
                     {review && (
-                        <div className={`mt-8 rounded-lg border p-4 ${review.is_correct ? 'border-green-500 bg-green-900/20' : 'border-red-500 bg-red-900/20'}`}>
-                            <h3 className="mb-2 font-bold">{review.is_correct ? "✅ Passed" : "❌ Needs Improvement"}</h3>
-                            <p className="mb-2 text-sm"><strong>Rating:</strong> {review.rating}/10</p>
-                            <p className="mb-2 text-sm"><strong>Time Complexity:</strong> {review.time_complexity}</p>
-                            <p className="text-sm italic">"{review.feedback}"</p>
+                        <div className={`mt-8 rounded-none border-l-4 p-4 ${review.is_correct ? 'border-green-500 bg-green-950/20' : 'border-red-500 bg-red-950/20'}`}>
+                            <h3 className={`mb-2 font-bold uppercase tracking-widest ${review.is_correct ? 'text-green-400' : 'text-red-400'}`}>
+                                {review.is_correct ? ">> EXECUTION_SUCCESS" : ">> COMPILE_ERROR"}
+                            </h3>
+                            <p className="mb-1 text-sm font-mono text-slate-300"><strong>SCORE:</strong> {review.rating}/10</p>
+                            <p className="mb-2 text-sm font-mono text-slate-300"><strong>COMPLEXITY:</strong> {review.time_complexity}</p>
+                            <p className="text-sm italic text-slate-400 border-t border-white/5 pt-2 mt-2">"{review.feedback}"</p>
 
                             {review.optimized_code && (
                                 <div className="mt-4">
-                                    <p className="text-xs font-bold uppercase text-slate-500">Suggested Solution</p>
-                                    <pre className="mt-1 overflow-x-auto rounded bg-black p-2 text-xs font-mono text-green-400">
+                                    <p className="text-xs font-bold uppercase text-cyan-500 mb-2">OPTIMIZED_SOLUTION.py</p>
+                                    <pre className="mt-1 overflow-x-auto rounded-none border border-white/10 bg-black/50 p-3 text-xs font-mono text-green-400">
                                         {review.optimized_code}
                                     </pre>
                                 </div>
@@ -108,53 +115,56 @@ export default function ArenaPage() {
                 </div>
 
                 {/* Code Editor Panel */}
-                <div className="flex w-2/3 flex-col bg-[#1e1e1e]">
-                    <div className="flex-1 relative overflow-hidden">
-                        <div className="absolute inset-0 flex">
+                <div className="flex w-2/3 flex-col bg-[#050a14] relative z-10">
+                    <div className="flex-1 relative overflow-hidden flex flex-col">
+                        <div className="flex bg-[#0a0f1e] text-xs text-slate-500 px-4 py-2 border-b border-white/5 font-mono">
+                            <span className="mr-4 text-cyan-600">main.py</span>
+                        </div>
+                        <div className="flex-1 flex overflow-hidden">
                             {/* Line Numbers */}
-                            <div className="w-12 bg-[#1e1e1e] border-r border-[#333] pt-4 text-right pr-3 text-slate-600 font-mono text-sm select-none">
+                            <div className="w-12 bg-[#0a0f1e]/50 border-r border-white/5 pt-4 text-right pr-3 text-slate-600 font-mono text-sm select-none">
                                 {code.split('\n').map((_, i) => (
                                     <div key={i}>{i + 1}</div>
                                 ))}
                             </div>
-                            {/* Simple Editor Implementation */}
+                            {/* Editor */}
                             <textarea
-                                className="flex-1 resize-none bg-[#1e1e1e] p-4 pt-4 font-mono text-sm text-[#d4d4d4] focus:outline-none leading-relaxed"
+                                className="flex-1 resize-none bg-[#050a14] p-4 pt-4 font-mono text-sm text-cyan-50 focus:outline-none leading-relaxed selection:bg-cyan-900/50"
                                 value={code}
                                 onChange={(e) => setCode(e.target.value)}
                                 spellCheck={false}
-                                placeholder="// Write your solution here..."
+                                placeholder="# Initialize Algorithm..."
                             />
                         </div>
                     </div>
 
                     {/* Console / Output Area */}
-                    <div className="h-48 border-t border-[#333] bg-[#0d0d0d] flex flex-col">
-                        <div className="flex items-center justify-between px-4 py-2 border-b border-[#333] bg-[#1e1e1e]">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Console Output</span>
+                    <div className="h-56 border-t border-white/10 bg-[#0a0f1e] flex flex-col shadow-[0_-5px_20px_rgba(0,0,0,0.5)]">
+                        <div className="flex items-center justify-between px-4 py-2 border-b border-white/5 bg-[#050a14]">
+                            <span className="text-xs font-bold text-cyan-600 uppercase tracking-widest font-mono">Terminal Output</span>
                             <div className="flex space-x-2">
-                                <Button size="sm" onClick={() => setReview(null)} variant="ghost" className="h-6 text-xs text-slate-500 hover:text-white">
+                                <Button size="sm" onClick={() => setReview(null)} variant="ghost" className="h-6 text-xs text-slate-500 hover:text-white rounded-none">
                                     Clear
                                 </Button>
                             </div>
                         </div>
                         <div className="flex-1 p-4 font-mono text-xs overflow-y-auto">
                             {submitting ? (
-                                <div className="text-yellow-500 animate-pulse">Running tests...</div>
+                                <div className="text-[#ffe600] animate-pulse">Running diagnostics...</div>
                             ) : review ? (
                                 <div className={review.is_correct ? "text-green-400" : "text-red-400"}>
-                                    {review.feedback ? `> ${review.feedback}` : "> Execution finished."}
+                                    {review.feedback ? `> ${review.feedback}` : "> Process terminated."}
                                     <br />
-                                    {review.time_complexity && <span className="text-blue-400">{`> Time Complexity: ${review.time_complexity}`}</span>}
+                                    {review.time_complexity && <span className="text-cyan-400">{`> Time Complexity: ${review.time_complexity}`}</span>}
                                 </div>
                             ) : (
-                                <span className="text-slate-600">{"> Ready to execute..."}</span>
+                                <span className="text-slate-600">{"> System Ready."}</span>
                             )}
                         </div>
-                        <div className="p-4 border-t border-[#333] bg-[#1e1e1e] flex justify-end">
-                            <Button onClick={handleSubmit} disabled={submitting} className="bg-green-600 hover:bg-green-700 text-white px-6">
+                        <div className="p-4 border-t border-white/5 bg-[#050a14] flex justify-end">
+                            <Button onClick={handleSubmit} disabled={submitting} className="bg-cyan-600 hover:bg-cyan-500 text-black px-8 rounded-none font-bold uppercase tracking-wider h-12 shadow-[0_0_15px_rgba(8,145,178,0.3)]">
                                 {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
-                                Run Code & Submit
+                                EXECUTE
                             </Button>
                         </div>
                     </div>

@@ -3,9 +3,21 @@ import sys
 import shutil
 import logging
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+
+# ... (imports) ...
+
+@app.post("/api/speak")
+async def text_to_speech(req: dict):
+    # req['text']
+    try:
+        audio_path = voice.generate_audio(req.get('text', ''))
+        return FileResponse(audio_path, media_type="audio/mp3") 
+    except Exception as e:
+         raise HTTPException(status_code=500, detail=str(e))
 
 # Add parent directory to path to find resume_parser, etc.
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -198,14 +210,7 @@ async def get_dashboard_stats():
         logger.error(f"Dashboard error: {e}")
         return []
 
-@app.post("/api/speak")
-async def text_to_speech(req: dict):
-    # req['text']
-    try:
-        audio_path = voice.generate_audio(req.get('text', ''))
-        return File(audio_path, media_type="audio/mp3") # This might need proper FileResponse
-    except Exception as e:
-         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/api/listen")
 async def speech_to_text(file: UploadFile = File(...)):
